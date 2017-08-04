@@ -27,7 +27,7 @@
 # Addon: My YouTube Add-on
 # Author: Add your name here
 
-#----------------------------------------------------------------
+----------------------------------------------------------------
 
 """
     SECTION 3:
@@ -41,13 +41,13 @@ import xbmcplugin   # contains functions required for creating directory structu
 
 # The following are often used, we are not using them in this particular file so they are commented out
 
-# import re           # allows use of regex commands, if you're intending on scraping you'll need this
-# import xbmcgui      # gui based functions, contains things like creating dialog pop-up windows
+ import re           # allows use of regex commands, if you're intending on scraping you'll need this
+ import xbmcgui      # gui based functions, contains things like creating dialog pop-up windows
 
 from koding import route, Addon_Setting, Add_Dir, Find_In_Text, Open_URL, OK_Dialog
 from koding import Open_Settings, Play_Video, Run, Text_File
 
-#------------------------------------------------------------
+------------------------------------------------------------
 
 """
     SECTION 4:
@@ -89,7 +89,7 @@ YOUTUBE_CHANNEL_ID_5 = "UCBDT-Kl4nHgEvpwYfLb315w"
     through as many different params as you wish.
 """
 
-#----------------------------------------------------------------
+----------------------------------------------------------------
  This is the main menu we open into
 @route(mode='main_menu')
 def Main_Menu():
