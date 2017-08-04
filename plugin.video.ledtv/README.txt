@@ -11,23 +11,17 @@ The source for the NaN repo is http://noobsandnerds.com/portal
 
 <h3>ONCE ADD-ON IS INSTALLED:</h3>
 Go through the default.py and read the comments for each section.
-You'll see this is linked to a test XML file which is online but
-there is also a locally stored XML file in the resources folder
-and in the default.py you can use this if you prefer.
+This is a very simple template to follow, all you need to do is add/edit the
+YouTube ID's (lines 62-66) - these can be either playlist or channel ID's.
 
-The comments in the Main_Menu() function are slightly more advanced and if
-you have no interest in understanding how or why the code does what it does then
-you can skip all of this and literally just start creating your XML files online.
-This add-on is good to go straight out of the box, the only thing you need to edit
-is the line 58 in default.py where the main_xml url is set - just set that to your
-own URL and you have yourself a fully functional playlist add-on!
+In the Main_Menu() function all you need to edit is the relevant Add_Dir command,
+if using a playlist then the url must start with BASE and if it's a channel you need
+to use BASE2. In these Add_Dir commands you can edit the title which shows as well as
+the artwork.
 
-Basically if you don't have access to a server or don't have internet
-access then you can set the local file to be your master xml file (for testing)
-but when you push your add-on live you'll most likely want to have your files online
-as it will make it very easy to update content. The add-on should never need updating
-(unless you want to add new features), the only thing you'd need to update is your
-online xml files.
+Have a little play around, it's very fun and easy to do and you'll have
+your very own YouTube based add-on up in no time and every time you update your YT
+channel/playlist the changes will automatically show in your add-on!!!
 
 
 <h3>Frequently Asked Questions:</h3>
