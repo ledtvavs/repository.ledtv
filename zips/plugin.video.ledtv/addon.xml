@@ -2,7 +2,7 @@
 <addon id="plugin.video.ledtv" name="LEDTV" version="0.0.1" provider-name="Al">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
-		<import addon="script.module.nanscrapers" version="0.5.22" />
+		<import addon="script.module.nanscrapers" version="0.5.24" />
         <import addon="script.module.python.koding.aio" version="0.9.6.7"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
