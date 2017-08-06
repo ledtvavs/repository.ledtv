@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.ledtv" name="LEDTV" version="0.0.1" provider-name="Al">
-	<requires>
-		<import addon="xbmc.python" version="2.19.0" />
-		<import addon="script.module.nanscrapers" version="0.5.5" />
-        <import addon="script.module.python.koding.aio" version="0.0.1"/>
-	</requires>
+<addon id="plugin.video.ledtv" 
+      name="LEDTV" 
+      version="0.0.2" 
+      provider-name="Al">
+ <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.python.koding.aio" version="0.5"/>
+    <import addon="plugin.video.youtube" version="5.0.0"/>
+  </requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
 		<provides>video</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">The Future Of Entertainment</summary>
 		<description lang="en">Bringing you the most up to date in LEDTV</description>
-		<platform>android</platform>
-		<forum>http://www.noobsandnerds.com/support</forum>
-		<website>www.noobsandnerds.com</website>
+		<platform></platform>
+		<forum></forum>
+		<website></website>
 		<news></news>
 		<genre></genre>
 		<video_guide></video_guide>
