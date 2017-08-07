@@ -45,14 +45,7 @@ def Main_Menu():
 # Uncomment the following line for help creating your add-on
     # Add_Dir(name='KODING TUTORIALS', url='', mode='tutorials', folder=True, icon=os.path.join(art_path,'icon.png'), fanart=os.path.join(art_path,'fanart.jpg'))
     
-# An example title/message we're going to send through to a popup dialog in the first Add_Dir item
-    my_message= "{'title' : 'LIVE EVENTS', 'msg' : 'This section is a work in progress, please keep an eye on the forum at noobsandnerds.com for all the latest updates'}"
 
-
-    Add_Dir(
-        name="", url=my_message, mode="simple_dialog", folder=False,
-        icon="")
-        
 # Add some YT Playlists (see we're using BASE as the url)
     Add_Dir( 
         name="UFC Embedded: Vlog Series", url=BASE+YOUTUBE_CHANNEL_ID_1+"/", folder=True,
