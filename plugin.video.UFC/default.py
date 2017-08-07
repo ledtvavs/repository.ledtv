@@ -29,7 +29,7 @@ YOUTUBE_CHANNEL_ID_1 = "PL9m3-_Hv6qNhbi6rOCFBUqLSxOHfT-3Bb"
 YOUTUBE_CHANNEL_ID_2 = "PLPM9xDYB3ktJpsbKGcmM6amTPLxOjJze8"
 YOUTUBE_CHANNEL_ID_3 = ""
 YOUTUBE_CHANNEL_ID_4 = ""
-YOUTUBE_CHANNEL_ID_5 = "UClgRkhTL3_hImCAmdLfDE4g"
+YOUTUBE_CHANNEL_ID_5 = ""
 
 master_modes = {
 # Required for certain koding functions to work
@@ -45,7 +45,14 @@ def Main_Menu():
 # Uncomment the following line for help creating your add-on
     # Add_Dir(name='KODING TUTORIALS', url='', mode='tutorials', folder=True, icon=os.path.join(art_path,'icon.png'), fanart=os.path.join(art_path,'fanart.jpg'))
     
+# An example title/message we're going to send through to a popup dialog in the first Add_Dir item
+    my_message= "{'title' : 'LIVE EVENTS', 'msg' : 'This section is a work in progress, please keep an eye on the forum at noobsandnerds.com for all the latest updates'}"
 
+
+    Add_Dir(
+        name="Support/Suggestions", url=my_message, mode="simple_dialog", folder=False,
+        icon="https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-087_info-512.png")
+        
 # Add some YT Playlists (see we're using BASE as the url)
     Add_Dir( 
         name="UFC Embedded: Vlog Series", url=BASE+YOUTUBE_CHANNEL_ID_1+"/", folder=True,
@@ -65,7 +72,7 @@ def Main_Menu():
 
 # Add some YT channels (see we're using BASE2 as the url for this one)
     Add_Dir( 
-        name="LEDTV Channel", url=BASE2+YOUTUBE_CHANNEL_ID_5+"/", folder=True,
+        name="", url=BASE2+YOUTUBE_CHANNEL_ID_5+"/", folder=True,
         icon="")
 #----------------------------------------------------------------
 def Simple_Dialog(my_vars):
