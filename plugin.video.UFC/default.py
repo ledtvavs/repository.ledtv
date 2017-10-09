@@ -27,7 +27,7 @@ BASE2 = "plugin://plugin.video.youtube/channel/"
 # Set each of your YouTube playlist id's
 YOUTUBE_CHANNEL_ID_1 = "PL9m3-_Hv6qNhbi6rOCFBUqLSxOHfT-3Bb"
 YOUTUBE_CHANNEL_ID_2 = "PLPM9xDYB3ktJpsbKGcmM6amTPLxOjJze8"
-YOUTUBE_CHANNEL_ID_3 = ""
+YOUTUBE_CHANNEL_ID_3 = "PLZg91hC6LlSf2MEmqGkexHuOSPpuNU6uM"
 YOUTUBE_CHANNEL_ID_4 = ""
 YOUTUBE_CHANNEL_ID_5 = ""
 
@@ -63,7 +63,7 @@ def Main_Menu():
         icon="http://ledtvonline.net/Images/Dana.jpg")
 
     Add_Dir( 
-        name="", url=BASE+YOUTUBE_CHANNEL_ID_3+"/", folder=True,
+        name="Knockouts", url=BASE+YOUTUBE_CHANNEL_ID_3+"/", folder=True,
         icon="")
 
     Add_Dir( 
