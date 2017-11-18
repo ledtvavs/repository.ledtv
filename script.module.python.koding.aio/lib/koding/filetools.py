@@ -21,6 +21,7 @@ import os
 import shutil
 import sys
 import xbmc
+import xbmcaddon
 import xbmcgui
 
 from systemtools import Last_Error
@@ -31,109 +32,22 @@ HOME     = xbmc.translatePath('special://home')
 PROFILE  = xbmc.translatePath('special://profile')
 DATABASE = os.path.join(PROFILE,'Database')
 #----------------------------------------------------------------    
-# TUTORIAL #
+# Legacy code, now use new function Compress
 def Archive_Tree(sourcefile, destfile, exclude_dirs=['temp'], exclude_files=['kodi.log','kodi.old.log','xbmc.log','xbmc.old.log','spmc.log','spmc.old.log'], message_header = 'ARCHIVING', message = 'Creating archive'):
-    """
-Archive a folder path including all sub-folders.
-There is a good chance this will be depreciated and merged with the Compress function
-in future. We will continue to keep this working but just a heads up the features in this
-such as custom messages will more than likely get ported into the Compress function at
-a later date so it may we worth using that as that has better functionality.
-
-Optional exclude_dirs and exclude_files lists can be sent through and these will be skipped
-
-IMPORTANT: There is a known bug where some certain compressed tar.gz files
-can cause the system to hang and a bad zipfile will continue to be made until
-it runs out of space on your storage device. In the unlikely event you encounter
-this issue just add the file(s) to your exclude list.
-
-CODE: Archive_Tree(sourcefile, destfile, [exclude_dirs, exclude_files, message_header, message]):
-
-AVAILABLE PARAMS:
-
-    (*) sourcefile   - This is the source folder of where you want to start the archive process
-
-    (*) destfile     - This is the file path you want to save the archive as (don't forget to
-    add the actual filename at end of path)
-
-    exclude_dirs   - This is optional, if you have folder names you want to exclude just
-    add them here as a list item
-
-    exclude_files  - This is optional, if you have specific file names you want to
-    exclude just add them here as a list item
-
-    message_header - This is optional, you can give the dialog progress window a title.
-    The default is "ARCHIVING"
-
-    message        - This is optional, the default text in the dialog progress window
-    will be "Creating archive" unless changed here.
-
-EXAMPLE CODE:
-HOME = xbmc.translatePath('special://home')
-DST = os.path.join(HOME,'test.zip')
-koding.Archive_Tree(HOME, DST)
-~"""
-    import zipfile
-    import time
-    import xbmcaddon
-    xbmc.log('ARCHIVE IN PROGRESS',2)
-    module_id        =  'script.module.python.koding.aio'
-    this_module      =  xbmcaddon.Addon(id=module_id)
-    folder_size      =  Folder_Size(sourcefile,'mb')
-    available_space  =  Free_Space(HOME,'mb')
-    if os.path.exists(sourcefile):
-        choice = True
-        if float(available_space) < float(folder_size):
-            choice = dialog.yesno(this_module.getLocalizedString(30809), this_module.getLocalizedString(30810), this_module.getLocalizedString(30811) % folder_size, this_module.getLocalizedString(30812) % available_space, yeslabel = this_module.getLocalizedString(30813), nolabel = this_module.getLocalizedString(30814))
-        if choice:
-            zipobj       = zipfile.ZipFile(destfile , 'w', zipfile.ZIP_DEFLATED)
-            rootlen      = len(sourcefile)
-            for_progress = []
-            contents     = []
-            
-            dp.create(message_header, message)
-
-            for base, dirs, files in os.walk(sourcefile):
-                for file in files:
-                    contents.append(file)
-            total_items =len(contents)
-            xbmc.log(str(contents),2)
-            
-            for base, dirs, files in os.walk(sourcefile):
-                dirs[:] = [d for d in dirs if d not in exclude_dirs]
-                files[:] = [f for f in files if f not in exclude_files and not 'crashlog' in f and not 'stacktrace' in f]
-                
-                for file in files:
-                    try:
-                        for_progress.append(file) 
-                        progress = len(for_progress) / float(total_items) * 100  
-                        dp.update(0,"Backing Up",'[COLOR yellow]%s[/COLOR]'%d, 'Please Wait')
-                        file_path = os.path.join(base, file)
-                    except:
-                        pass
-                    try:
-                        timestamp_1980 = 315532800
-                        file_date = os.path.getmtime(file_path)                    
-                        if file_date < timestamp_1980:
-                            xbmc.log('OLD File date: %s'%file_date, 2)
-                            os.utime(file_path,(315536400, 315536400))
-                        zipobj.write(file_path, file_path[rootlen:])  
-                    except:
-                        xbmc.log('Failed to backup: %s'%file_path, 2)
-
-                    if dp.iscanceled():
-                        sys.exit()
-            zipobj.close()
-            dp.close()
-    else:
-        dialog.ok(this_module.getLocalizedString(30965),this_module.getLocalizedString(30815) % sourcefile)
+    Compress(src=sourcefile, dst=destfile, exclude_dirs=exclude_dirs, exclude_files=exclude_files)
 #----------------------------------------------------------------    
 # TUTORIAL #
-def Compress(src,dst,compression='zip',parent=False):
+def Compress(src,dst,compression='zip',parent=False, exclude_dirs=['temp'], exclude_files=['kodi.log','kodi.old.log','xbmc.log','xbmc.old.log','spmc.log','spmc.old.log'], message_header = 'ARCHIVING', message = 'Creating archive'):
     """
 Compress files in either zip or tar format. This will most likely be replacing
 Archive_Tree longer term as this has better functionality but it's currently
 missing the custom message and exclude files options.
+
+IMPORTANT: There was a known bug where some certain compressed tar.gz files can cause the system to hang
+and a bad zipfile will continue to be made until it runs out of space on your storage device. In the unlikely
+event you encounter this issue just add the problematic file(s) to your exclude list. I think this has since
+been fixed since a complete re-code to this function, or at least I've been unable to recreate it. If you
+find this problem is still occuring please let me know (whufclee on noobsandnerds.com forum), thankyou.
 
 CODE: Compress(src,dst,[compression,parent])
 
@@ -150,6 +64,17 @@ AVAILABLE PARAMS:
     it will include the parent folder name - ideal if you want to zip up
     an add-on folder and be able to install via Kodi Settings.
 
+    exclude_dirs   - This is optional, if you have folder names you want to exclude just
+    add them here as a list item. By default the folder 'temp' is added to this list so
+    if you need to include folders called temp make sure you send through a list, even
+    if it's an empty one. The reason for leaving temp out is that's where Kodi logfiles
+    and crashlogs are stored on a lot of devices and these are generally not needed in
+    backup zips.
+
+    exclude_files  - This is optional, if you have specific file names you want to
+    exclude just add them here as a list item. By default the list consists of:
+    'kodi.log','kodi.old.log','xbmc.log','xbmc.old.log','spmc.log','spmc.old.log'
+
 EXAMPLE CODE:
 koding_path = xbmc.translatePath('special://home/addons/script.module.python.koding.aio')
 zip_dest = xbmc.translatePath('special://home/test_addon.zip')
@@ -162,61 +87,49 @@ koding.Compress(src=koding_path,dst=tar_dest,compression='tar',parent=True)
 koding.Compress(src=koding_path,dst=tar_dest2,compression='tar',parent=False)
 koding.Text_Box('CHECK HOME FOLDER','If you check your Kodi home folder you should now have 4 different compressed versions of the Python Koding add-on.\n\ntest_addon.zip: This has been zipped up with parent set to True\n\ntest_addon2.zip: This has been zipped up with parent set to False.\n\ntest_addon.tar: This has been compressed using tar format and parent set to True\n\ntest_addon2.tar: This has been compressed using tar format and parent set to False.\n\nFeel free to manually delete these.')
 ~"""
-    if parent:
-        import zipfile
-        import tarfile
-        directory = os.path.dirname(dst)
-        if not os.path.exists(directory):
-            try:
-                os.makedirs(directory)
-            except:
-                dialog.ok('ERROR','The destination directory you gave does not exist and it wasn\'t possible to create it.')
-                return
-        if compression == 'zip':
-            zip = zipfile.ZipFile(dst, 'w', compression=zipfile.ZIP_DEFLATED)
-        elif compression == 'tar':
-            zip = tarfile.open(dst, mode='w')
-        root_len = len(os.path.dirname(os.path.abspath(src)))
-        for root, dirs, files in os.walk(src):
-            archive_root = os.path.abspath(root)[root_len:]
+    import zipfile
+    import tarfile
+    directory = os.path.dirname(dst)
+    if not os.path.exists(directory):
+        try:
+            os.makedirs(directory)
+        except:
+            dialog.ok('ERROR','The destination directory you gave does not exist and it wasn\'t possible to create it.')
+            return
+    if compression == 'zip':
+        zip = zipfile.ZipFile(dst, 'w', compression=zipfile.ZIP_DEFLATED)
+    elif compression == 'tar':
+        zip = tarfile.open(dst, mode='w')
+    module_id        =  'script.module.python.koding.aio'
+    this_module      =  xbmcaddon.Addon(id=module_id)
+    folder_size      =  Folder_Size(src,'mb')
+    available_space  =  Free_Space(HOME,'mb')
+    if os.path.exists(src):
+        choice = True
+        if float(available_space) < float(folder_size):
+            choice = dialog.yesno(this_module.getLocalizedString(30809), this_module.getLocalizedString(30810), this_module.getLocalizedString(30811) % folder_size, this_module.getLocalizedString(30812) % available_space, yeslabel = this_module.getLocalizedString(30813), nolabel = this_module.getLocalizedString(30814))
+        if choice:
+            root_len = len(os.path.dirname(os.path.abspath(src)))
+            for base, dirs, files in os.walk(src):
+                dirs[:]  = [d for d in dirs if d not in exclude_dirs]
+                files[:] = [f for f in files if f not in exclude_files and not 'crashlog' in f and not 'stacktrace' in f]
+                archive_root = os.path.abspath(base)[root_len:]
 
-            for f in files:
-                    fullpath = os.path.join(root, f)
-                    archive_name = os.path.join(archive_root, f)
-                    if compression == 'zip':
-                        zip.write(fullpath, archive_name, zipfile.ZIP_DEFLATED)
-                    elif compression == 'tar':
-                        zip.add(fullpath, archive_name)
-        zip.close()
-    else:
-        if compression == 'zip':
-            shutil.make_archive(dst.replace('.zip',''), 'zip', src)
-        elif compression == 'tar':
-            shutil.make_archive(dst.replace('.tar',''), 'tar', src)
-#----------------------------------------------------------------    
-# TUTORIAL #
-def Convert_Special(filepath=xbmc.translatePath('special://home')):
-    """
-Convert physcial paths stored in text files to their special:// equivalent.
-
-CODE: Convert_Special([filepath])
-
-AVAILABLE PARAMS:
-
-    filepath  -  This is the path you want to scan, by default it's set to the Kodi HOME directory.
-
-EXAMPLE CODE:
-koding.Convert_Special()
-~"""    
-    import urllib
-    for root, dirs, files in os.walk(filepath):
-        for file in files:
-            if file.endswith(".xml") or file.endswith(".hash") or file.endswith("properies") or file.endswith(".ini"):
-                contents     = Text_File(os.path.join(root,file), 'r')
-                encodedpath  = urllib.quote(HOME)
-                encodedpath2 = encodedpath.replace('%3A','%3a').replace('%5C','%5c')
-                newfile = contents.replace(HOME, 'special://home/').replace(encodedpath, 'special://home/').replace(encodedpath2, 'special://home/')
-                Text_File(os.path.join(root, file), 'w', newfile)
+                for f in files:
+                    fullpath = os.path.join(base, f)
+                    if parent:
+                        archive_name = os.path.join(archive_root, f)
+                        if compression == 'zip':
+                            zip.write(fullpath, archive_name, zipfile.ZIP_DEFLATED)
+                        elif compression == 'tar':
+                            zip.add(fullpath, archive_name)
+                    else:
+                        newpath = fullpath.split(src)[1]
+                        if compression == 'zip':
+                            zip.write(fullpath, newpath, zipfile.ZIP_DEFLATED)
+                        elif compression == 'tar':
+                            zip.add(fullpath, newpath)
+            zip.close()
 #----------------------------------------------------------------    
 # TUTORIAL #
 def Create_Paths(path=''):
@@ -366,9 +279,9 @@ koding.Delete_Files(filepath=delete_path, filetype='.txt', subdirectories=True)
                     try:
                         os.remove(delete_path)
                     except:
-                        kodi.log(Last_Error())
+                        xbmc.log(Last_Error(),2)
     else:
-        xbmc.log('### Cannot delete files as directory does not exist: %s' % filepath)
+        xbmc.log('### Cannot delete files as directory does not exist: %s' % filepath,2)
 #----------------------------------------------------------------
 # TUTORIAL #
 def Delete_Folders(filepath='', ignore=[]):
@@ -406,9 +319,11 @@ koding.Dummy_File(dst=file1, size=10, size_format='kb')
 koding.Dummy_File(dst=file2, size=10, size_format='kb')
 koding.Dummy_File(dst=file3, size=10, size_format='kb')
 
-dialog.ok('TEST FILE CREATED','If you look in your addon_data folder you should now see a new test folder containing 3 dummy files. The folder name is \'py_koding_test\'.')
-if dialog.yesno('DELETE FOLDER','Everything except file1.txt will now be removed from:', '/userdata/py_koding_test/','Do you want to continue?'):
+dialog.ok('[COLOR gold]TEST FILE CREATED[/COLOR]','If you look in your userdata folder you should now see a new test folder containing 3 dummy files. The folder name is \'py_koding_test\'.')
+if dialog.yesno('[COLOR gold]DELETE FOLDER[/COLOR]','Everything except file1.txt will now be removed from:', '/userdata/py_koding_test/','Do you want to continue?'):
     koding.Delete_Folders(filepath=delete_path, ignore=[file1])
+    dialog.ok('[COLOR gold]DELETE LEFTOVERS[/COLOR]','When you press OK we will delete the whole temporary folder we created including it\'s contents')
+    koding.Delete_Folders(filepath=delete_path)
 ~"""
     exclude_list = ['','/','\\','C:/','storage']
 
@@ -419,20 +334,26 @@ if dialog.yesno('DELETE FOLDER','Everything except file1.txt will now be removed
 # If there's some ignore files we run through deleting everything but those files
     elif len(ignore) > 0:
         for root, dirs, files in os.walk(filepath, topdown=False):
+            cont = True
             if not root in ignore:
-                for file in files:
-                    file_path = os.path.join(root,file)
-                    if file_path not in ignore:
+                for item in ignore:
+                    if item in root:
+                        cont=False
+                        break
+                if cont:
+                    for file in files:
+                        file_path = os.path.join(root,file)
+                        if file_path not in ignore:
+                            try:
+                                os.remove(file_path)
+                            except:
+                                pass
+
+                    if len(os.listdir(root)) == 0:
                         try:
-                            os.remove(file_path)
+                            os.rmdir(root)
                         except:
                             pass
-
-                if len(os.listdir(root)) == 0:
-                    try:
-                        os.rmdir(root)
-                    except:
-                        pass
 
 # If a simple complete wipe of a directory and all sub-directories is required we use this
     elif os.path.exists(filepath) and filepath != '':
@@ -483,6 +404,39 @@ os.remove(dummy)
     f.close()
 #----------------------------------------------------------------
 # TUTORIAL #
+def End_Path(path):
+    """
+Split the path at every '/' and return the final file/folder name.
+If your path uses backslashes rather than forward slashes it will use
+that as the separator.
+
+CODE:  End_Path(path)
+
+AVAILABLE PARAMS:
+
+    path  -  This is the path where you want to grab the end item name.
+
+EXAMPLE CODE:
+addons_path = xbmc.translatePath('special://home/addons')
+file_name = koding.End_Path(path=addons_path)
+dialog.ok('ADDONS FOLDER','Path checked:',addons_path,'Folder Name: [COLOR=dodgerblue]%s[/COLOR]'%file_name)
+file_path = xbmc.translatePath('special://home/addons/script.module.python.koding.aio/addon.xml')
+file_name = koding.End_Path(path=file_path)
+dialog.ok('FILE NAME','Path checked:',file_path,'File Name: [COLOR=dodgerblue]%s[/COLOR]'%file_name)
+~"""
+    if '/' in path:
+        path_array = path.split('/')
+        if path_array[-1] == '':
+            path_array.pop()
+    elif '\\' in path:
+        path_array = path.split('\\')
+        if path_array[-1] == '':
+            path_array.pop()
+    else:
+        return path
+    return path_array[-1]
+#----------------------------------------------------------------
+# TUTORIAL #
 def Extract(_in, _out, dp=None, show_error=False):
     """
 This function will extract a zip or tar file and return true or false so unlike the
@@ -510,10 +464,16 @@ AVAILABLE PARAMS:
     will appear showing details of the file which failed to extract.
 
 EXAMPLE CODE:
+koding_path = xbmc.translatePath('special://home/addons/script.module.python.koding.aio')
+zip_dest = xbmc.translatePath('special://home/test_addon.zip')
+extract_dest = xbmc.translatePath('special://home/TEST')
+koding.Compress(src=koding_path,dst=zip_dest,compression='zip',parent=True)
 dp = xbmcgui.DialogProgress()
 dp.create('Extracting Zip','Please Wait')
-if koding.Extract(_in=src,_out=dst,dp=dp,show_error=True):
-    dialog.ok('YAY IT WORKED!','Successful extraction complete')
+if koding.Extract(_in=zip_dest,_out=extract_dest,dp=dp,show_error=True):
+    dialog.ok('YAY IT WORKED!','We just zipped up your python koding add-on then extracted it to a new folder in your Kodi root directory called TEST. Press OK to delete these files.')
+    os.remove(zip_dest)
+    shutil.rmtree(extract_dest)
 else:
     dialog.ok('BAD NEWS!','UH OH SOMETHING WENT HORRIBLY WRONG')
 ~"""
@@ -549,14 +509,14 @@ else:
                     return True
 
                 except:
-                    xbmc.log(Last_Error())
+                    xbmc.log(Last_Error(),2)
                     return False
             else:
                 try:
                     zin.extractall(_out)
                     return True
                 except:
-                    xbmc.log(Last_Error())
+                    xbmc.log(Last_Error(),2)
                     return False
         
         else:
@@ -564,78 +524,6 @@ else:
     else:
         if show_error:
             dialog.ok(this_module.getLocalizedString(30965),this_module.getLocalizedString(30815) % _in)
-#----------------------------------------------------------------
-# TUTORIAL #
-def Fresh_Install():
-    """
-Attempt to completely wipe your install. Currently this only supports
-LE/OE/Android. On LE/OE it will perform a hard reset and on Android it
-will wipe the data for the current running app (untested)
-
-CODE:  Fresh_Install()
-
-EXAMPLE CODE:
-if dialog.yesno('TOTAL WIPEOUT!','This will attempt give you a totally fresh install of Kodi.','Are you sure you want to continue?'):
-    if dialog.yesno('[COLOR=gold]FINAL CHANCE!!![/COLOR]','If you click Yes this WILL attempt to wipe your install', '[COLOR=dodgerblue]ARE YOU 100% CERTAIN YOU WANT TO WIPE?[/COLOR]'):
-        clean_state = koding.Fresh_Install()
-        if not clean_state:
-            dialog.ok('SYSTEM NOT SUPPORTED','Your platform is not yet supported by this function, you will have to manually wipe.')
-~"""
-    from systemtools import Running_App, Get_ID
-    if xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)") or xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)"):
-        resetpath='storage/.cache/reset_oe'
-        Text_File(resetpath,'w')
-        xbmc.executebuiltin('reboot')
-    elif xbmc.getCondVisibility('System.Platform.Android'):
-        import subprocess
-        running   = Running_App()
-        cleanwipe = subprocess.Popen(['exec ''pm clear '+str(running)+''], executable='/system/bin/sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=Get_ID(setid=True)).communicate()[0]
-    else:
-        return False
-#----------------------------------------------------------------
-# TUTORIAL #
-def Find_In_Text(content, start, end, show_errors = False):
-    """
-Regex through some text and return a list of matches.
-Please note this will return a LIST so even if only one item is found
-you will still need to access it as a list, see example below.
-
-CODE: koding.Find_In_Text(content, start, end, [show_errors])
-
-AVAILABLE PARAMS:
-    
-    (*) content  -  This is the string to search
-
-    (*) start    -  The start search string
-
-    (*) end      -  The end search string
-
-    show_errors  -  Default is False, if set to True the code will show help
-    dialogs for bad code.
-
-EXAMPLE CODE:
-textsearch = 'This is some text so lets have a look and see if we can find the words "lets have a look"'
-search_result = koding.Find_In_Text(textsearch, 'text so ', ' and see')
-dialog.ok('SEARCH RESULT','You searched for the start string of "text so " and the end string of " and see". Your result is: %s' % search_result[0])
-
-# Please note: we know for a fact there is only one result which is why we're only accessing list item zero.
-# If we were expecting more than one return we would probably do something more useful and loop through in a for loop.
-~"""
-    import re
-    if content == None or content == False:
-        if show_errors:
-            dialog.ok('ERROR WITH REGEX','No content sent through - there\'s nothing to scrape. Please check the website address is still active (details at bottom of log).')
-            xbmc.log(content)
-        return
-    if end != '':
-        links = re.findall('%s([\s\S]*?)%s' % (start, end), content)
-    if len(links)>0:
-        return links
-    else:
-        if show_errors:
-            xbmc.log(content)
-            dialog.ok('ERROR WITH REGEX','Please check your regex, there was content sent through to search but there are no matches for the regex supplied. The raw content has now been printed to the log')
-        return None
 #----------------------------------------------------------------
 # TUTORIAL #
 def Free_Space(dirname = HOME, filesize = 'b'):
@@ -732,6 +620,104 @@ dialog.ok('Folder Size','KODI HOME: %s MB' % home_size)
         return "%.4f" % (float(finalsize / 1024) / 1024 / 1024 / 1024)
 #----------------------------------------------------------------
 # TUTORIAL #
+def Fresh_Install(keep_addons=[],ignore=[],keepdb=True):
+    """
+Attempt to completely wipe your install. You can send through a list
+of addons or paths you want to ignore (leave in the setup) or you can
+leave blank. If left blank and the platform is OpenELEC or LibreELEC
+it will perform a hard reset command followed by a reboot.
+
+CODE:  Fresh_Install([keep_addons, ignore, keepdb)
+
+AVAILABLE PARAMS:
+
+    keep_addons  -  This is optional, if you have specific add-ons you want to omit
+    from the wipe (leave intact) then just enter a list of add-on id's here. The code
+    will determine from the addon.xml file which dependencies and sub-dependencies are
+    required for that add-on so there's no need to create a huge list, you only need to
+    list the master add-on id's. For example if you want to keep the current skin and
+    your add-on you would use: keep_addons=['plugin.program.myaddon',System('currentskin')]
+    and all addons/dependencies associated with those two add-ons will be added to the ignore
+    list.
+
+    ignore  -  This is optional, you can send through a list of paths you want to omit from
+    the wipe. You can use folder paths to skip the whole folder or you can use individual
+    file paths. Please make sure you use the physical path and not special://
+    So before creating your list make sure you use xbmc.translatePath()
+
+    keepdb  -  By default this is set to True which means the code will keep all the Kodi databases
+    intact and perform a profile reload once wipe is complete. This will mean addons, video, music,
+    epg, ADSP and viewtypes databases will remain completely untouched and Kodi should be fine to use
+    without the need for a restart. If you set keepdb to False nothing will happen once the wipe has
+    completed and it's up to you to choose what to do in your main code. I would highly recommend an
+    ok dialog followed by xbmc.executebuiltin('Quit'). This will force Kodi to recreate all the relevant
+    databases when they re-open. If you try and continue using Kodi without restarting the databases
+    will not be recreated and you risk corruption.
+
+EXAMPLE CODE:
+if dialog.yesno('[COLOR gold]TOTAL WIPEOUT![/COLOR]','This will attempt give you a totally fresh install of Kodi.','Are you sure you want to continue?'):
+    if dialog.yesno('[COLOR gold]FINAL CHANCE!!![/COLOR]','If you click Yes this WILL attempt to wipe your install', '[COLOR=dodgerblue]ARE YOU 100% CERTAIN YOU WANT TO WIPE?[/COLOR]'):
+        clean_state = koding.Fresh_Install()
+~"""
+# If it's LE/OE and there are no files to ignore we do a hard reset
+    from systemtools import Cleanup_Textures
+    if ( len(ignore)==0 ) and ( len(keep_addons)==0 ) and ( xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)") or xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)") ):
+        xbmc.log('OE DETECTED',2)
+        resetpath='storage/.cache/reset_oe'
+        Text_File(resetpath,'w')
+        xbmc.executebuiltin('reboot')
+    else:
+        from addons import Dependency_Check
+        xbmc.log('DOING MAIN WIPE',2)
+        skip_array = []
+        addonsdb = DB_Path_Check('addons')
+        textures = DB_Path_Check('Textures')
+        Cleanup_Textures(frequency=1,use_count=999999)
+        if len(keep_addons) > 0:
+            ignorelist = Dependency_Check(addon_id = keep_addons, recursive = True)
+            for item in ignorelist:
+                skip_array.append(xbmcaddon.Addon(id=item).getAddonInfo('path'))
+        skip_array.append(addonsdb)
+        skip_array.append(textures)
+        if keepdb:
+            try:
+                skip_array.append( DB_Path_Check('Epg') )
+            except:
+                xbmc.log('No EPG DB Found, skipping',2)
+            try:
+                skip_array.append( DB_Path_Check('MyVideos') )
+            except:
+                xbmc.log('No MyVideos DB Found, skipping',2)
+            try:
+                skip_array.append( DB_Path_Check('MyMusic') )
+            except:
+                xbmc.log('No MyMusic DB Found, skipping',2)
+            try:
+                skip_array.append( DB_Path_Check('TV') )
+            except:
+                xbmc.log('No TV DB Found, skipping',2)
+            try:
+                skip_array.append( DB_Path_Check('ViewModes') )
+            except:
+                xbmc.log('No ViewModes DB Found, skipping',2)
+            try:
+                skip_array.append( DB_Path_Check('ADSP') )
+            except:
+                xbmc.log('No ADSP DB Found, skipping',2)
+        for item in ignore:
+            skip_array.append(item)
+        Delete_Folders(filepath=HOME, ignore=skip_array)
+        Refresh()
+        if keepdb:
+            Refresh('profile')
+
+# Good option for wiping android data but not so good if using the app as a launcher!
+    # elif xbmc.getCondVisibility('System.Platform.Android'):
+    #     import subprocess
+    #     running   = Running_App()
+    #     cleanwipe = subprocess.Popen(['exec ''pm clear '+str(running)+''], executable='/system/bin/sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=Get_ID(setid=True)).communicate()[0]
+#----------------------------------------------------------------
+# TUTORIAL #
 def Get_Contents(path,folders=True,subfolders=False,exclude_list=[],full_path=True,filter=''):
     """
 Return a list of either files or folders in a given path.
@@ -806,110 +792,6 @@ koding.Text_Box('ADDON FOLDERS','Below is a list of folders found in the addons 
                     else:
                         final_list.append(dirname)
     return final_list
-#---------------------------------------------------------------------------------------------------
-# TUTORIAL #
-def Highest_Version(content=[],start_point='',end_point=''):
-    """
-Send through a list of strings which all have a common naming structure,
-the one with the highest version number will be returned.
-
-CODE: Highest_Version(content,[start_point,end_point])
-
-AVAILABLE PARAMS:
-
-    (*) content  -  This is the list of filenames you want to check.
-
-    start_point  -  If your filenames have a common character/string immediately
-    before the version number enter that here. For example if you're looking at
-    online repository/add-on files you would use '-' as the start_point. The version
-    numbers always appear after the final '-' with add-ons residing on repo's.
-
-    end_point  -  If your version number is followed by a common string (e.g. '.zip')
-    then enter it in here.
-
-EXAMPLE CODE:
-mylist = ['plugin.test-1.0.zip','plugin.test-0.7.zip','plugin.test-1.1.zip','plugin.test-0.9.zip']
-dialog.ok('[COLOR=gold]OUR LIST OF FILES[/COLOR]', '[COLOR=dodgerblue]%s[/COLOR]\n[COLOR=powderblue]%s[/COLOR]\n[COLOR=dodgerblue]%s[/COLOR]\n[COLOR=powderblue]%s[/COLOR]'%(mylist[0],mylist[1],mylist[2],mylist[3]))
-
-highest = Highest_Version(content=mylist,start_point='-',end_point='.zip')
-dialog.ok('HIGHEST VERSION', 'The highest version number of your files is:','[COLOR=dodgerblue]%s[/COLOR]'%highest)
-~"""
-    highest      = 0
-    highest_ver  = ''
-    for item in content:
-        version = item.replace(end_point,'')
-        version = version.split(start_point)
-        version = version[len(version)-1]
-        if version > highest:
-            highest      = version
-            highest_ver  = item
-    return highest_ver
-#----------------------------------------------------------------
-# TUTORIAL #
-def md5_check(src,string=False):
-    """
-Return the md5 value of string/file/directory, this will return just one unique value.
-
-CODE: md5_check(src,[string])
-
-AVAILABLE PARAMS:
-
-    (*) src  -  This is the source you want the md5 value of.
-    This can be a string, path of a file or path to a folder.
-
-    string  -  By default this is set to False but if you want to send
-    through a string rather than a path set this to True.
-
-EXAMPLE CODE:
-home = xbmc.translatePath('special://home')
-home_md5 = koding.md5_check(home)
-dialog.ok('md5 Check', 'The md5 of your home folder is:', '[COLOR=dodgerblue]%s[/COLOR]'%home_md5)
-
-guisettings = xbmc.translatePath('special://profile/guisettings.xml')
-guisettings_md5 = koding.md5_check(guisettings)
-dialog.ok('md5 Check', 'The md5 of your guisettings.xml:', '[COLOR=dodgerblue]%s[/COLOR]'%guisettings_md5)
-
-mystring = 'This is just a random text string we\'ll get the md5 value of'
-myvalue = koding.md5_check(src=mystring,string=True)
-dialog.ok('md5 String Check', 'String to get md5 value of:', '[COLOR=dodgerblue]%s[/COLOR]'%mystring)
-dialog.ok('md5 String Check', 'The md5 value of your string:', '[COLOR=dodgerblue]%s[/COLOR]'%myvalue)
-~"""
-    import hashlib
-    import os
-
-    SHAhash = hashlib.md5()
-    if not os.path.exists(src) and not string:
-        return -1
-
-# If source is a file
-    if string:
-        return hashlib.md5(src).hexdigest()
-# If source is a file
-    elif not os.path.isdir(src):
-        return hashlib.md5(open(src,'rb').read()).hexdigest()
-
-# If source is a directory
-    else:
-        try:
-            for root, dirs, files in os.walk(src):
-              for names in files:
-                filepath = os.path.join(root,names)
-                try:
-                  f1 = open(filepath, 'rb')
-                except:
-                  f1.close()
-                  continue
-
-            while 1:
-# Read file in as little chunks
-              buf = f1.read(4096)
-              if not buf : break
-              SHAhash.update(hashlib.md5(buf).hexdigest())
-            f1.close()
-        except:
-            return -2
-
-        return SHAhash.hexdigest()
 #----------------------------------------------------------------
 # TUTORIAL #
 def Move_Tree(src, dst, dp=None):
@@ -985,33 +867,6 @@ shutil.rmtree(destination)
         dp.close()
 #----------------------------------------------------------------
 # TUTORIAL #
-def Split_Lines(raw_string, size):
-    """
-Splits up a piece of text into a list of lines x amount of chars in length.
-
-CODE: koding.Split_Lines(raw_string, size)
-
-AVAILABLE PARAMS:
-
-    (*) raw_string  -  This is the text you want split up into lines
-
-    (*) size        -  This is the maximum size you want the line length to be (in characters)
-
-EXAMPLE CODE:
-raw_string = 'This is some test code, let\'s take a look and see what happens if we split this up into lines of 20 chars per line'
-my_list = koding.Split_Lines(raw_string,20)
-koding.Text_Box('List of lines',str(my_list))
-~"""    
-    final_list=[""]
-    for i in raw_string:
-        length = len(final_list)-1
-        if len(final_list[length]) < size:
-            final_list[length]+=i
-        else:
-            final_list += [i]
-    return final_list
-#----------------------------------------------------------------
-# TUTORIAL #
 def Text_File(path, mode, text = ''):
     """
 Open/create a text file and read/write to it.
@@ -1054,6 +909,6 @@ except:
             return True
 
     except:
-        xbmc.log(Last_Error())
+        xbmc.log(Last_Error(),2)
         return False
 #----------------------------------------------------------------

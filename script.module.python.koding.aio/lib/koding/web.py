@@ -17,9 +17,12 @@
 # then any affected add-ons will be blacklisted and will not be able to work on the same system
 # as any other add-ons which use this code. Thank you for your cooperation.
 
+import os
 import time
 import urllib
+import xbmc
 import xbmcgui
+from systemtools import Python_Version
 #----------------------------------------------------------------    
 # TUTORIAL #
 def Cleanup_URL(url):
@@ -55,7 +58,7 @@ def Delete_Cookies(filename='cookiejar'):
     """
 This will delete your cookies file.
 
-CODE: koding.Delete_Cookies([filename])
+CODE: Delete_Cookies([filename])
 
 AVAILABLE PARAMS:
 
@@ -67,6 +70,7 @@ AVAILABLE PARAMS:
 EXAMPLE CODE:
 Open_URL(url='http://google.com',cookiejar='google')
 dialog.ok('GOOGLE COOKIES CREATED','We have just opened a page to google.com, if you check your addon_data folder for your add-on you should see a cookies folder and in there should be a cookie called "google". When you press OK this will be removed.')
+koding.Delete_Cookies(filename='google')
 ~"""
     from addons     import Addon_Info
     Addon_Version = Addon_Info(id='version')
@@ -80,11 +84,11 @@ dialog.ok('GOOGLE COOKIES CREATED','We have just opened a page to google.com, if
         return False
 #----------------------------------------------------------------    
 # TUTORIAL #
-def Download(url, dest, dp = None):
+def Download(url, dest, dp=None, timeout=5):
     """
 This will download a file, currently this has to be a standard download link which doesn't require cookies/login.
 
-CODE: koding.Download(src,dst,[dp])
+CODE: Download(src,dst,[dp])
 dp is optional, by default it is set to false
 
 AVAILABLE PARAMS:
@@ -95,15 +99,26 @@ AVAILABLE PARAMS:
 
     dp - This is optional, if you pass through the dp function as a DialogProgress() then you'll get to see the progress of the download. If you choose not to add this paramater then you'll just get a busy spinning circle icon until it's completed. See the example below for a dp example.
 
+    timeout - By default this is set to 5. This is the max. amount of time you want to allow for checking whether or
+    not the url is a valid link and can be accessed via the system.
+
 EXAMPLE CODE:
-src = 'http://noobsandnerds.com/python_koding/my_first_addon.zip'
-dst = xbmc.translatePath('special://home/my_first_addon.zip')
+src = 'http://noobsandnerds.com/portal/Bits%20and%20bobs/Documents/user%20guide%20of%20the%20gyro%20remote.pdf'
+dst = xbmc.translatePath('special://home/remote.pdf')
 dp = xbmcgui.DialogProgress()
 dp.create('Downloading File','Please Wait')
 koding.Download(src,dst,dp)
+dialog.ok('[COLOR gold]DOWNLOAD COMPLETE[/COLOR]','Your download is complete, please check your home Kodi folder. There should be a new file called remote.pdf - you can delete this if you want.')
 ~"""
-    start_time=time.time()
-    urllib.urlretrieve(url, dest, lambda nb, bs, fs: Download_Progress(nb, bs, fs, dp, start_time))
+    status = Validate_Link(url,timeout)
+    if status >= 200 and status < 400:
+        if Python_Version() < 2.7 and url.startswith('https'):
+            url = url.replace('https','http')
+        start_time=time.time()
+        urllib.urlretrieve(url, dest, lambda nb, bs, fs: Download_Progress(nb, bs, fs, dp, start_time))
+        return True
+    else:
+        return False
 #----------------------------------------------------------------    
 def Download_Progress(numblocks, blocksize, filesize, dp, start_time):
     """ internal command ~"""
@@ -139,7 +154,7 @@ def Get_Extension(url):
     """
 Return the extension of a url
 
-CODE:   koding.Get_Extension(url)
+CODE:   Get_Extension(url)
 
 AVAILABLE PARAMS:
 
@@ -158,17 +173,19 @@ dialog.ok('FILE EXTENSION','The file extension of this Big Buck Bunny sample is:
     return ext
 #----------------------------------------------------------------
 # TUTORIAL #
-def Open_URL(url='',post_type='get',payload={},headers={'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'},cookies=True,auth=None,timeout=None,cookiejar=None):
+def Open_URL(url='',post_type='get',payload={},headers={'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'},cookies=True,auth=None,timeout=None,cookiejar=None,proxies={}):
     """
 If you need to pull the contents of a webpage it's very simple to do so by using this function.
+This uses the Python Requests module, for more detailed info on how the params work
+please look at the following link: http://docs.python-requests.org/en/master/user/advanced/
 
-IMPORTANT: This function is designed to convert a query string into a post.
-If you want to send through a post which contains ampersands or question
-marks you MUST send the params through as a dictionary. By default this function
-presumes the url only contains one question mark and it splits at that point and
-will then split the params at every instance of an ampersand.
+IMPORTANT: This function will attempt to convert a url with a query string into the
+correct params for a post or get command but I highly recommend sending through your
+query string as a dictionary using the payload params. It's much cleaner and is a
+safer way of doing things, if you send through your url with a query string attached
+then I take no responsibility if it doesn't work!
 
-CODE:   koding.Open_URL(url,[post_type,payload,headers,cookies,auth,timeout,cookiejar])
+CODE:   Open_URL(url,[post_type,payload,headers,cookies,auth,timeout,cookiejar])
 
 AVAILABLE PARAMS:
 
@@ -196,8 +213,18 @@ AVAILABLE PARAMS:
     set to addon_data/<addon_id>/cookies/cookiejar but if you have multiple
     websites you access then you may want to use a separate filename for each site.
 
+    proxies - Use a proxy for accessing the link, see requests documentation for full
+    information but essentially you would send through a dictionary like this:
+    proxies = {"http":"http://10.10.1.10:3128","htts":"https://10.10.1.10:3128"}
+
 EXAMPLE CODE:
-url_contents = koding.Open_URL('http://testpage.com?query1=value1&query2=value2', post_type='get')
+dialog.ok('[COLOR gold]OPEN FORUM PAGE[/COLOR]','We will attempt to open the noobsandnerds forum page and return the contents. You will now be asked for your forum credentials.')
+myurl = 'http://noobsandnerds.com/support/index.php'
+username = koding.Keyboard('ENTER USERNAME')
+password = koding.Keyboard('ENTER PASSWORD')
+params = {"username":username,"password":password}
+xbmc.log(repr(params),2)
+url_contents = koding.Open_URL(url=myurl, payload=params, post_type='get')
 koding.Text_Box('CONTENTS OF WEB PAGE',url_contents)
 ~"""
     import os
@@ -210,8 +237,7 @@ koding.Text_Box('CONTENTS OF WEB PAGE',url_contents)
     from __init__   import converthex, dolog, Encryption, ADDON_ID, LOGIN, FORUM, USERNAME, PASSWORD, KODI_VER
     from addons     import Addon_Info
     from filetools  import Text_File
-    dolog('POST TYPE: %s'%post_type)
-    dolog('url: %s'%url)
+
     Addon_Version = Addon_Info(id='version')
     Addon_Profile = xbmc.translatePath(Addon_Info(id='profile'))
     Cookie_Folder = os.path.join(Addon_Profile,'cookies')
@@ -234,7 +260,6 @@ koding.Text_Box('CONTENTS OF WEB PAGE',url_contents)
 
 # If the payload is empty we split the params
     if len(payload) == 0:
-        dolog('###### QUERY STRING CONVERSION MODE')
 
 # If the url sent through is not http then we presume it's hitting the NaN page
         if not url.startswith(converthex('68747470')):
@@ -257,10 +282,13 @@ koding.Text_Box('CONTENTS OF WEB PAGE',url_contents)
     dolog('PAYLOAD: %s'%payload)
 
     try:
+        if Python_Version() < 2.7 and url.startswith('https'):
+            url = url.replace('https','http')
+
         if post_type == 'post':
-            r = requests.post(url, payload, headers=headers, cookies=my_cookies, auth=auth, timeout=timeout)
+            r = requests.post(url, payload, headers=headers, cookies=my_cookies, auth=auth, timeout=timeout, proxies=proxies)
         else:
-            r = requests.get(url, payload, headers=headers, cookies=my_cookies, auth=auth, timeout=timeout)
+            r = requests.get(url, payload, headers=headers, cookies=my_cookies, auth=auth, timeout=timeout, proxies=proxies)
     except:
         dolog('Failed to pull content for %s'%url)
         return False
@@ -281,7 +309,7 @@ def Validate_Link(url='',timeout=30):
     """
 Returns the code for a particular link, so for example 200 is a good link and 404 is a URL not found
 
-CODE:   koding.Validate_Link(url,[timeout])
+CODE:   Validate_Link(url,[timeout])
 
 AVAILABLE PARAMS:
 
@@ -298,6 +326,9 @@ else:
 ~"""
     import requests
     import xbmc
+
+    if Python_Version() < 2.7 and url.startswith('https'):
+        url = url.replace('https','http')
 
     try:
         r = requests.get(url,timeout=timeout)

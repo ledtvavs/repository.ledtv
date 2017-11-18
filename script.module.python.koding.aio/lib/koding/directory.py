@@ -121,15 +121,14 @@ Add_Dir(name='TEST ITEM', url='', mode='test_item', folder=False, context_items=
 # ^ This will add an item to the list AND a context menu item for when bring up the menu (when focused on this item).
 # ^^ The context_override is set to False which means the new items will appear alongside the default Kodi context menu items.
 ~"""
-    from __init__       import dolog
     from systemtools    import Data_Type
+    from vartools       import Convert_Special
 
     module_id   =  'script.module.python.koding.aio'
     this_module =  xbmcaddon.Addon(id=module_id)
 
     addon_handle = int(sys.argv[1])
 # Check we're in an appropriate section for the content type set
-    dolog(xbmc.getInfoLabel('Window.Property(xmlfile)'))
     song_only_modes  = ['songs','artist','album','song','music']
     video_only_modes = ['sets','tvshows','seasons','actors','directors','unknown','video','set','movie','tvshow','season','episode']
     if xbmc.getInfoLabel('Window.Property(xmlfile)') == 'MyVideoNav.xml' and content_type in song_only_modes:
@@ -204,7 +203,7 @@ Add_Dir(name='TEST ITEM', url='', mode='test_item', folder=False, context_items=
 
     u   = sys.argv[0]
     u += "?mode="           +str(mode)
-    u += "&url="            +urllib.quote_plus(url)
+    u += "&url="            +Convert_Special(url,string=True)
     u += "&name="           +urllib.quote_plus(name)
     u += "&iconimage="      +urllib.quote_plus(icon)
     u += "&fanart="         +urllib.quote_plus(fanart)
@@ -327,8 +326,7 @@ koding.Populate_List(url=link, start_point=sp, end_point=ep, separator=sep)
     import re
     import urlparse
     from __init__       import dolog
-    from filetools      import Find_In_Text
-    from systemtools    import Cleanup_String
+    from vartools       import Find_In_Text, Cleanup_String
     from video          import Play_Video
     from web            import Open_URL, Get_Extension, Cleanup_URL
 

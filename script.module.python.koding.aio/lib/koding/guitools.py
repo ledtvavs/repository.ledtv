@@ -23,7 +23,8 @@ import xbmc
 import xbmcgui
 from systemtools import Last_Error
 
-dialog = xbmcgui.Dialog()
+dialog      = xbmcgui.Dialog()
+koding_path = xbmc.translatePath("special://home/addons/script.module.python.koding.aio")
 #----------------------------------------------------------------    
 # TUTORIAL #
 def Browse_To_Folder(header='Select the folder you want to use', path = 'special://home'):
@@ -44,15 +45,17 @@ EXAMPLE CODE:
 folder = koding.Browse_To_Folder('Choose a folder you want to use')
 dialog.ok('FOLDER DETAILS','Folder path: [COLOR=dodgerblue]%s[/COLOR]'%folder)
 ~"""    
-    text = dialog.browse(3, header, 'files', '', False, False, path)
+    text = dialog.browse(type=3, heading=header, shares='files', useThumbs=False, treatAsFolder=False, defaultt=path)
     return text
 #----------------------------------------------------------------    
 # TUTORIAL #
-def Browse_To_File(header='Select the file you want to use', path = 'special://home/addons/', extension = ''):
+def Browse_To_File(header='Select the file you want to use', path='special://home/addons/', extension='', browse_in_archives=False):
     """
-Browse to a file and return the path
+This will allow the user to browse to a specific file and return the path.
 
-CODE: koding.Browse_To_File([header, path, extension])
+IMPORTANT: Do not confuse this with the Browse_To_Folder function
+
+CODE: koding.Browse_To_File([header, path, extension, browse_in_archives])
 
 AVAILABLE PARAMS:
 
@@ -65,17 +68,24 @@ AVAILABLE PARAMS:
     extension -  Optionally set extensions to filter by, let's say you only wanted
     zip and txt files to show you would send through '.zip|.txt'
 
+    browse_in_archives -  Set to true if you want to be able to browse inside zips and
+    other archive files. By default this is set to False.
+
 EXAMPLE CODE:
-folder = koding.Browse_To_File(header='Choose a file you want to use', path='special://home/userdata')
-dialog.ok('FOLDER DETAILS','Folder path: [COLOR=dodgerblue]%s[/COLOR]'%folder)
+dialog.ok('[COLOR gold]BROWSE TO FILE 1[/COLOR]','We will now browse to your addons folder with browse_in_archives set to [COLOR dodgerblue]False[/COLOR]. Try clicking on a zip file if you can find one (check packages folder).')
+folder = koding.Browse_To_File(header='Choose a file you want to use', path='special://home/addons')
+dialog.ok('FOLDER DETAILS','File path: [COLOR=dodgerblue]%s[/COLOR]'%folder)
+dialog.ok('[COLOR gold]BROWSE TO FILE 2[/COLOR]','We will now browse to your addons folder with browse_in_archives set to [COLOR dodgerblue]True[/COLOR]. Try clicking on a zip file if you can find one (check packages folder).')
+folder = koding.Browse_To_File(header='Choose a file you want to use', path='special://home/addons', browse_in_archives=True)
+dialog.ok('FOLDER DETAILS','File path: [COLOR=dodgerblue]%s[/COLOR]'%folder)
 ~"""
     if not path.endswith(os.sep):
         path += os.sep
     try:
-        text = dialog.browse(type=1, heading=header, shares='myprograms', mask=extension, useThumbs=False, treatAsFolder=True, defaultt=path)
+        text = dialog.browse(type=1, heading=header, shares='myprograms', mask=extension, useThumbs=False, treatAsFolder=browse_in_archives, defaultt=path)
     except:
         text = dialog.browse(type=1, heading=header, s_shares='myprograms', mask=extension, useThumbs=False,
-                             treatAsFolder=True, defaultt=path)
+                             treatAsFolder=browse_in_archives, defaultt=path)
     return text
 #----------------------------------------------------------------    
 # TUTORIAL #
@@ -153,17 +163,20 @@ else:
         return True        
 #----------------------------------------------------------------    
 # TUTORIAL #
-def Custom_Dialog(pos='center',dialog='Text', size='700x500', button_width=200,\
+def Custom_Dialog(pos='center', dialog='Text', size='700x500', button_width=200,\
     header='Disclaimer', main_content='Add some text here', buttons=['Decline','Agree'],\
     header_color='gold', text_color='white', background='000000', transparency=100,\
-    highlight_color='blue'):
+    highlight_color='gold', button_color_focused='4e91cf', button_trans_focused=100,\
+    button_color_nonfocused='586381', button_trans_nonfocused=50):
     """
 A fully customisable dialog where you can have as many buttons as you want.
 Similar behaviour to the standard Kodi yesno dialog but this allows as many buttons
 as you want, as much text as you want (with a slider) as well as fully configurable
 sizing and positioning.
 
-CODE: Custom_Dialog([pos, dialog, size, button_width, header, main_text, buttons])
+CODE: Custom_Dialog([pos, dialog, size, button_width, header, main_content, buttons,\
+    header_color, text_color, background, transparency, highlight_color, button_color_focused,\
+    button_trans_focused, button_color_nonfocused, button_trans_nonfocused])
 
 AVAILABLE PARAMS:
 
@@ -193,8 +206,6 @@ AVAILABLE PARAMS:
 
     text_color  -  Set the text colour, by default it's 'white'
 
-    highlight_color  -  Set the highlighted text colour, by default it's 'blue'
-
     main_content  -  This is sent through as a string and is the main message text
     you want to show in your dialog. When the ability to add videos, images etc.
     is added there may well be new options added to this param but it will remain
@@ -210,6 +221,20 @@ AVAILABLE PARAMS:
     transparency  -  Set the percentage of transparency as an integer. By default
     it's set to 100 which is a solid colour.
 
+    highlight_color  -  Set the highlighted text colour, by default it's 'gold'
+
+    button_color_focused - Using the same format as background you can set the
+    colour to use for a button when it's focused.
+
+    button_trans_focused - Using the same format as transparency you can set the
+    transparency amount to use on the button when in focus.
+
+    button_color_nonfocused - Using the same format as background you can set the
+    colour to use for buttons when they are not in focus.
+
+    button_trans_nonfocused - Using the same format as transparency you can set the
+    transparency amount to use on the buttons when not in focus.
+
 EXAMPLE CODE:
 main_text = 'This is my main text.\n\nYou can add anything you want in here and the slider will allow you to see all the contents.\n\nThis example shows using a blue background colour and a transparency of 90%.\n\nWe have also changed the highlighted_color to yellow.'
 my_buttons = ['button 1', 'button 2', 'button 3']
@@ -221,14 +246,15 @@ my_buttons = ['button 1', 'button 2', 'button 3','button 4', 'button 5', 'button
 my_choice = koding.Custom_Dialog(main_content=main_text,pos='center',size='fullscreen',buttons=my_buttons)
 dialog.ok('CUSTOM DIALOG 2','You selected option %s'%my_choice,'The value of this is: [COLOR=dodgerblue]%s[/COLOR]'%my_buttons[my_choice])
 ~"""
-    koding_path = xbmc.translatePath("special://home/addons/script.module.python.koding.aio")
     skin_path   = os.path.join(koding_path,"resources","skins","Default","720p")
     ACTION      = -1
 # Convert the transparency percentage to hex
     transparency = float(transparency) / 100 * 255
-    xbmc.log('transparency: %s'%transparency,2)
     transparency = hex(int(transparency)).split('x')[1]
-    xbmc.log('transparency: %s'%transparency,2)
+    button_trans_focused = float(button_trans_focused) / 100 * 255
+    button_trans_focused = hex(int(button_trans_focused)).split('x')[1]
+    button_trans_nonfocused = float(button_trans_nonfocused) / 100 * 255
+    button_trans_nonfocused = hex(int(button_trans_nonfocused)).split('x')[1]
 
 # Work out the dialog dimensions
     if size == 'fullscreen':
@@ -318,8 +344,8 @@ dialog.ok('CUSTOM DIALOG 2','You selected option %s'%my_choice,'The value of thi
                 <width>%s</width>\n\
                 <height>40</height>\n\
                 <label>%s</label>\n\
-                <texturefocus border="20">list-focus.png</texturefocus>\n\
-                <texturenofocus border="20">list-nofocus.png</texturenofocus>\n\
+                <texturefocus colordiffuse="%s%s">DialogBack.png</texturefocus>\n\
+                <texturenofocus colordiffuse="%s%s">DialogBack.png</texturenofocus>\n\
                 <font>font12_title</font>\n\
                 <textcolor>%s</textcolor>\n\
                 <focusedcolor>%s</focusedcolor>\n\
@@ -329,7 +355,9 @@ dialog.ok('CUSTOM DIALOG 2','You selected option %s'%my_choice,'The value of thi
                 <onup>%s</onup>\n\
                 <ondown>%s</ondown>\n\
             </control>\n' % (button_num, button_x, button_y, button_width, buttons[counter-1],\
-                            text_color, highlight_color, button_num-1, button_num+1, onup, ondown)
+                            button_trans_focused, button_color_focused, button_trans_nonfocused,\
+                            button_color_nonfocused, text_color, highlight_color, button_num-1,\
+                            button_num+1, onup, ondown)
         button_num += 1
         counter    += 1
 
@@ -431,16 +459,17 @@ dialog.ok('IP RETURNED','You typed in:', '', '[COLOR=dodgerblue]%s[/COLOR]'%myte
 mytext = koding.Keyboard(heading='Password',kb_type='password')
 dialog.ok('MD5 RETURN','The md5 for this password is:', '', '[COLOR=dodgerblue]%s[/COLOR]'%mytext)
 ~"""
+    from vartools import Decode_String
     kb_type = eval( 'xbmcgui.INPUT_%s'%kb_type.upper() )
     if hidden:
         hidden = eval( 'xbmcgui.%s_HIDE_INPUT'%kb_type.upper() )
     keyboard = dialog.input(heading,default,kb_type,hidden,autoclose)
 
     if keyboard != '':
-        return unicode(keyboard, "utf-8")
+        return keyboard
     
     elif not return_false:
-        return default
+        return Decode_String(default)
     
     else:
         return False
@@ -571,6 +600,155 @@ koding.Text_Box('TEST HEADER','Just some random text... Use kodi tags for new li
     controller.getControl(1).setLabel(header)
     controller.getControl(5).setText(message)
 #----------------------------------------------------------------
+# TUTORIAL #
+def Reset_Percent(property='update_percent_',window_id=10000):
+    """
+If using the Update_Progress function for setting percentages in skinning then this
+will allow you to reset all the percent properties (1-100)
+
+CODE: Reset_Percent([property,window_id])
+
+AVAILABLE PARAMS:
+
+    property  -  the property name you want reset, this will reset all properties starting
+    with this string from 1-100. For example if you use the default 'update_percent_' this
+    will loop through and reset update_percent_1, update_percent_2 etc. all the way through
+    to update_percent_100.
+
+    window_id -  By default this is set to 10000 but you can send any id through you want.
+
+    kwargs  -  Send through any other params and the respective property will be set.colours etc.')
+~"""
+    counter = 0
+    while counter <= 100:
+        xbmcgui.Window(10000).clearProperty('update_percent_%s'%counter)
+        counter +=1
+#----------------------------------------------------------------
+# TUTORIAL #
+def Update_Progress(total_items,current_item,**kwargs):
+    """
+This function is designed for skinners but can be used for general Python too. It will
+work out the current percentage of items that have been processed and update the
+"update_percent" property accordingly (1-100). You can also send through any properties
+you want updated and it will loop through updating them with the relevant values.
+
+To send through properties just send through the property name as the param and assign to a value.
+Example: Update_Progress( total_items=100,current_item=56, {"myproperty1":"test1","myproperty2":"test2"} )
+
+
+CODE: Update_Progress(total_items,current_item,[kwargs])
+
+AVAILABLE PARAMS:
+
+    (*) total_items  -  Total amount of items in your list you're processing
+
+    (*) current_item -  Current item number that's been processed.
+
+    kwargs  -  Send through any other params and the respective property will be set.colours etc.
+~"""
+    Reset_Percent()
+    for item in kwargs:
+        if item.endswith('color'):
+            value = '0xFF'+kwargs[item]
+        else:
+            value = kwargs[item]
+        if value == 'false' or value == '' and not item.endswith('color'):
+            xbmcgui.Window(10000).clearProperty(item)
+        elif value:
+            xbmcgui.Window(10000).setProperty(item, value)
+    percent = 100*(current_item/(total_items*1.0))
+    newpercent=int(percent)
+    if (newpercent % 1 == 0) and (newpercent <=100):
+        xbmcgui.Window(10000).setProperty('update_percent',str(newpercent))
+        xbmcgui.Window(10000).setProperty('update_percent_%s'%newpercent,'true')
+    if newpercent == 100:
+        xbmc.executebuiltin('Action(firstpage)')
+#-----------------------------------------------------------------------------
+# TUTORIAL #
+def Update_Screen(disable_quit=False, auto_close=True):
+    """
+This will create a full screen overlay showing progress of updates. You'll need to
+use this in conjunction with the Update_Progress function.
+
+CODE: Update_Screen([disable_quit, auto_close))
+
+AVAILABLE PARAMS:
+
+    disable_quit  -  By default this is set to False and pressing the parent directory
+    button (generally esc) will allow you to close the window. Setting this to True
+    will mean it's not possible to close the window manually.
+
+    auto_close  -  By default this is set to true and when the percentage hits 100
+    the window will close. If you intend on then sending through some more commands
+    you might want to consider leaving this window open in which case you'd set this
+    to false. Bare in mind if you go this route the window will stay active until
+    you send through the kill command which is: xbmc.executebuiltin('Action(firstpage)')
+
+EXAMPLE CODE:
+mykwargs = {
+    "update_header"    : "Downloading latest updates",\
+    "update_main_text" : "Your device is now downloading all the latest updates.\nThis shouldn\'t take too long, "\
+                         "depending on your internet speed this could take anything from 2 to 10 minutes.\n\n"\
+                         "Once downloaded the system will start to install the updates.",\
+    "update_bar_color" : "4e91cf",\
+    "update_icon"      : "special://home/addons/script.module.python.koding.aio/resources/skins/Default/media/update.png",\
+    "update_spinner"   : "true"}
+Update_Screen()
+counter = 1
+while counter <= 60:
+    xbmc.sleep(300)
+    Update_Progress(total_items=60,current_item=counter,**mykwargs)
+    if counter == 30:
+        mykwargs = {
+            "update_header"        : "Halfway there!",\
+            "update_main_text"     : "We just updated the properties to show how you can change things on the fly "\
+                                     "simply by sending through some different properties. Both the icon and the "\
+                                     "background images you see here are being pulled from online.",\
+            "update_header_color"  : "4e91cf",\
+            "update_percent_color" : "4e91cf",\
+            "update_bar_color"     : "4e91cf",\
+            "update_background"    : "http://www.planwallpaper.com/static/images/518164-backgrounds.jpg",\
+            "update_icon"          : "http://totalrevolution.tv/img/tr_small_black_bg.jpg",\
+            "update_spinner"       : "false"}
+    counter += 1
+~"""
+    import threading
+    update_screen_thread = threading.Thread(target=Show_Update_Screen, args=[disable_quit, auto_close])
+    update_screen_thread.start()
+    xbmc.sleep(2000)
+
+def Show_Update_Screen(disable_quit=False,auto_close=True):
+    xbmcgui.Window(10000).clearProperty('update_icon')
+    xbmcgui.Window(10000).clearProperty('update_percent')
+    xbmcgui.Window(10000).clearProperty('update_spinner')
+    xbmcgui.Window(10000).clearProperty('update_header')
+    xbmcgui.Window(10000).clearProperty('update_main_text')
+    xbmcgui.Window(10000).setProperty('update_background','whitebg.jpg')
+    xbmcgui.Window(10000).setProperty('update_percent_color','0xFF000000')
+    xbmcgui.Window(10000).setProperty('update_bar_color','0xFF000000')
+    xbmcgui.Window(10000).setProperty('update_main_color','0xFF000000')
+    xbmcgui.Window(10000).setProperty('update_header_color','0xFF000000')
+# Set a property so we can determine if update screen is active
+    xbmcgui.Window(10000).setProperty('update_screen','active')
+    d=MyUpdateScreen('Loading.xml',koding_path,disable_quit=disable_quit,auto_close=auto_close)
+    d.doModal()
+    del d
+    xbmcgui.Window(10000).clearProperty('update_screen')
+
+class MyUpdateScreen(xbmcgui.WindowXMLDialog):
+    def __init__(self,*args,**kwargs):
+        self.disable_quit=kwargs['disable_quit']
+        self.auto_close=kwargs['auto_close']
+        self.WINDOW=xbmcgui.Window( 10000 )
+    def onAction( self, action ):
+        if action in [10,7]:
+            if self.disable_quit:
+                xbmc.log("ESC and HOME Disabled",2)
+            else:
+                self.close()
+        if action==159 and self.auto_close:
+            self.close()
+#----------------------------------------------------------------    
 # TUTORIAL #
 def YesNo_Dialog(title,message,yes=None,no=None):
     """
