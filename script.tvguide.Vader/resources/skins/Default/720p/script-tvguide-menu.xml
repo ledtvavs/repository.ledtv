@@ -131,7 +131,7 @@
 		<control type="label" id="7001">
 			<description>program title</description>
 			<posx>250</posx>
-			<posy>165</posy>
+			<posy>155</posy>
 			<width>710</width>
 			<height>50</height>
 			<textcolor>white</textcolor>

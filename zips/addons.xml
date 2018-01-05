@@ -295,7 +295,7 @@
 	</extension>
 </addon>
 
-<addon id="script.tvguide.Vader" name="TV Guide" version="1.4.22" provider-name="IPTVGuy">
+<addon id="script.tvguide.Vader" name="TV Guide" version="1.4.64" provider-name="IPTVGuy">
     <requires>
         <import addon="xbmc.python" version="2.19.0"/>
         <import addon="script.module.simplejson" version="3.3.0"/>

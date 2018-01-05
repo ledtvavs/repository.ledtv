@@ -34,19 +34,14 @@ import xbmcplugin,xbmcgui,urllib,urllib2,re,time,datetime,string,StringIO,loggin
 
 ADDON = xbmcaddon.Addon(id='script.tvguide.Vader')
 
-ffmpeg = ADDON.getSetting('autoplaywiths.ffmpeg')
+file_name = 'Special://home/addons/plugin.video.VADER/addon.xml'
+if xbmcvfs.exists(file_name):
+    xbmcvfs.rename('Special://home/addons/script.tvguide.Vader/resources/skins/Default','Special://home/addons/script.tvguide.Vader/resources/skins/Default_BASIC')
+    xbmcvfs.rename('Special://home/addons/script.tvguide.Vader/resources/skins/VADER','Special://home/addons/script.tvguide.Vader/resources/skins/Default')
 if ADDON.getSetting('cat.source') == "0":
     xbmcvfs.copy('http://localhost:62555/getCategories','special://profile/addon_data/script.tvguide.Vader/categories.ini')
 elif ADDON.getSetting('cat.source') == "1":
     xbmcvfs.copy((base64.decodestring('aHR0cDovL3R2c3RyZWFtZXJzLm5ldC9zbXVyZi9WR3VpZGUvQWx0ZXJuYXRpdmUvY2F0ZWdvcmllcy5pbmk=')),'special://profile/addon_data/script.tvguide.Vader/categories.ini')
-if ADDON.getSetting('epg.focus.color') == "[COLOR ff606060]black[/COLOR]":
-    xbmcvfs.delete('special://home/userdata/addon_data/script.tvguide.Vader/settings.xml')
-if ffmpeg:
-    st = os.stat(ffmpeg)
-    try:
-        os.chmod(ffmpeg, st.st_mode | stat.S_IEXEC)
-    except:
-        pass
 
 if len(sys.argv) > 1:
     category = sys.argv[1]

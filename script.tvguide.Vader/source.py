@@ -308,14 +308,16 @@ class Database(object):
 
     def _updateChannelAndProgramListCaches(self, date, progress_callback, clearExistingProgramList):
         # todo workaround service.py 'forgets' the adapter and convert set in _initialize.. wtf?!
-        xbmc.log('[script.tvguide.Vader] Updating chan & programs ...', xbmc.LOGDEBUG)
 
         sqlite3.register_adapter(datetime.datetime, self.adapt_datetime)
         sqlite3.register_converter('timestamp', self.convert_datetime)
 
         lock = 'special://profile/addon_data/script.tvguide.Vader/db.lock'
         if xbmcvfs.exists(lock):
+            xbmc.log('[script.tvguide.Vader] db currently locked...', xbmc.LOGDEBUG)
+
             return
+        xbmc.log('[script.tvguide.Vader] Updating chan & programs ...', xbmc.LOGDEBUG)
 
         isCacheExpired = self._isCacheExpired(date)
         needReset = self.source.needReset
@@ -853,14 +855,19 @@ class Database(object):
         channels = self._getChannelList(True)
         channelIds = [cc.id for cc in channels]
         channelMap = dict()
+        ids = []
         for cc in channels:
             if cc.id:
                 channelMap[cc.id] = cc
-        search = "%%%s%%" % search
-        c.execute('SELECT * FROM programs WHERE channel LIKE ? AND source=? AND start_date<=? AND end_date>=? ',
-                  [search, self.source.KEY, now, now])
+                search = search.replace(' ','.*')
+                if re.search(search,cc.title,flags=re.I):
+                    ids.append(cc.id)
+        if not ids:
+            return
+        ids_string = '\',\''.join(ids)
+        c.execute('SELECT * FROM programs WHERE channel IN (\'' + ids_string + '\') AND source=? AND start_date<=? AND end_date>=? ',
+                  [self.source.KEY, now, now])
         for row in c:
-            log(row)
             program = Program(channelMap[row['channel']], title=row['title'], sub_title=row['sub_title'], startDate=row['start_date'], endDate=row['end_date'],
                           description=row['description'], categories=row['categories'],
                           imageLarge=row['image_large'], imageSmall=row['image_small'], season=row['season'], episode=row['episode'],
@@ -1854,8 +1861,8 @@ class XMLTVSource(Source):
                 time.sleep(2)
                 tries = tries + 1
                 # tb = traceback.format_exc()
-                # xbmc.log('[script.tvguide.Vader] ' + str(tb), xbmc.LOGNOTICE)
-                xbmc.log('[script.tvguide.Vader] streams response: ' + streamsTxt)
+                xbmc.log('[script.tvguide.Vader] ' + str(tb), xbmc.LOGNOTICE)
+                xbmc.log('[script.tvguide.Vader] streams response: ' + streamsTxt, xbmc.LOGNOTICE )
                 pass
 
         from HTMLParser import HTMLParser
@@ -1872,41 +1879,62 @@ class XMLTVSource(Source):
             result = Channel(cid, title, '', logo, streamUrl, visible)
             yield result
 
-        today = datetime.datetime.now()
-        if ADDON.getSetting('epg.forward') == "0":
-            addDays = today + datetime.timedelta(days=1)
-        elif ADDON.getSetting('epg.forward') == "1":
-            addDays = today + datetime.timedelta(days=3)
-        elif ADDON.getSetting('epg.forward') == "2":
-            addDays = today + datetime.timedelta(days=5)
-        if ADDON.getSetting('epg.back') == "0":
-            subDays = today - datetime.timedelta(days=1)
-        elif ADDON.getSetting('epg.back') == "1":
-            subDays = today - datetime.timedelta(days=2)
-        elif ADDON.getSetting('epg.back') == "2":
-            subDays = today - datetime.timedelta(days=3)
-        epgStart = subDays.strftime("%Y%m%d000000")
-        epgEnd = addDays.strftime("%Y%m%d%H%M%S")
+        today = datetime.datetime.utcnow()
+        epgLimit = ADDON.getSetting('epg.limit6')
+        if epgLimit == 'true':
+            epgLimit = True
+        else:
+            epgLimit = False
+
+        if epgLimit == True:
+            try:
+                subDays = today - datetime.timedelta(hours=6)
+                epgStart = subDays.strftime("%Y%m%d%H%M%S")
+                addDays = today + datetime.timedelta(hours=6)
+                epgEnd = addDays.strftime("%Y%m%d%H%M%S")
+            except:
+                tb = traceback.format_exc()
+                xbmc.log('[script.tvguide.Vader] ' + str(tb), xbmc.LOGNOTICE)
+
+        else:
+            if ADDON.getSetting('epg.forward') == "0":
+                addDays = today + datetime.timedelta(days=1)
+            elif ADDON.getSetting('epg.forward') == "1":
+                addDays = today + datetime.timedelta(days=3)
+            elif ADDON.getSetting('epg.forward') == "2":
+                addDays = today + datetime.timedelta(days=5)
+            if ADDON.getSetting('epg.back') == "0":
+                subDays = today - datetime.timedelta(days=1)
+            elif ADDON.getSetting('epg.back') == "1":
+                subDays = today - datetime.timedelta(days=2)
+            elif ADDON.getSetting('epg.back') == "2":
+                subDays = today - datetime.timedelta(days=3)
+            epgStart = subDays.strftime("%Y%m%d000000")
+            epgEnd = addDays.strftime("%Y%m%d%H%M%S")
         dialog = xbmcgui.DialogProgressBG()
-        dialog.create('EPG Updater', 'Updating EPG...')
 
         i = 0
 
         # for stream_id in valid_streams:
-        # epgUrl = 'http://vaders.tv/epg?gzip=true&start={epgStart}&end={epgEnd}&stream_id={stream_id}'.format(stream_id=stream_id,epgStart=epgStart, epgEnd=epgEnd)
+        #     epgUrl = 'http://vaders.tv/epg?gzip=true&start={epgStart}&end={epgEnd}&stream_id={stream_id}'.format(stream_id=stream_id,epgStart=epgStart, epgEnd=epgEnd)
         epgUrl = 'http://vaders.tv/epg?gzip=true&start={epgStart}&end={epgEnd}'.format(epgStart=epgStart, epgEnd=epgEnd)
 
-        xbmc.log('[script.tvguide.Vader] ' + str(epgUrl), xbmc.LOGDEBUG)
+        xbmc.log('[script.tvguide.Vader] ' + str(epgUrl), xbmc.LOGNOTICE)
 
         programsReq = requests.get(epgUrl, timeout=120)
         programsReq.encoding = 'utf-8'
         programsText = programsReq.text
 
         # programsText = unicode(programsText, 'utf-8')
-        xbmc.log('[script.tvguide.Vader] downloaded json txt', xbmc.LOGDEBUG)
+        xbmc.log('[script.tvguide.Vader] downloaded json txt', xbmc.LOGNOTICE)
         programs = json.loads(programsText, encoding='utf-8')
-        xbmc.log('[script.tvguide.Vader] loaded json epg', xbmc.LOGDEBUG)
+        del programsText
+        del programsReq
+
+        xbmc.log('[script.tvguide.Vader] loaded json epg', xbmc.LOGNOTICE)
         totalCount = len(programs)
+        dialog.create('EPG Updater', 'Updating EPG...')
+
         for program in programs:
 
             try:
@@ -1926,10 +1954,10 @@ class XMLTVSource(Source):
                         if title and type(title) == type(unicode()):
                             title = h.unescape(title)
 
-                        from unidecode import unidecode
+                        # xbmc.log('adding : ' + str(title), xbmc.LOGNOTICE)
                         try:
                             dialog.update(int(self.percentage(i, totalCount)), 'Loading EPG Data From Server',
-                                      'Updating {0}'.format(str(title)))
+                                      'Updating...')
                         except:
                             pass
                         sub_title = None

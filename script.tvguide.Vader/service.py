@@ -92,7 +92,7 @@ if __name__ == '__main__':
             monitor = xbmc.Monitor()
             xbmc.log("[script.tvguide.Vader] Background service started...", xbmc.LOGDEBUG)
             if ADDON.getSetting('background.startup') == 'true':
-                Service() #don't run on start up
+                # Service() #don't run on start up
                 ADDON.setSetting('last.background.update', str(time.time()))
                 if ADDON.getSetting('service.addon.folders') == "true":
                     xbmc.executebuiltin('RunScript(special://home/addons/script.tvguide.Vader/ReloadAddonFolders.py)')

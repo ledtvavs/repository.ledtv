@@ -317,9 +317,67 @@ class TVGuide(xbmcgui.WindowXML):
     C_NEXT_UP_NEXT_CHANNEL_IMAGE = 9010
     C_MAIN_UP_NEXT_TIME_REMAINING = 9012
     C_MAIN_REFRESH = 10101
+    C_MAIN_MATCHCENTER = 431266
+    C_MAIN_VOD = 431267
+    C_MAIN_MATCHCENTER2 = 431269
+    C_MAIN_LIVESPORTS = 431268
+    C_MAIN_MOVIES = 431270
+    C_MAIN_TVSHOWS = 431271
+    C_MAIN_TVSHOWS4K = 431272
+    C_MAIN_WBVOD = 431273
+    C_MAIN_MOVIES4K = 431274
+    C_MAIN_MOVIESBY = 431275
+    C_MAIN_LIVETVCHANNELS = 431276
+    C_MAIN_TVCATCHUP = 431277
+    C_MAIN_MATCHCENTERCATCHUP = 431278
+    C_MAIN_TOOLS = 431280
+    C_MAIN_MYACCOUNT = 431281
+
     def __new__(cls):
         return super(TVGuide, cls).__new__(cls, 'script-tvguide-main.xml', SKIN_PATH, SKIN)
 
+    def Matchcenter(self):
+        mc = 'plugin://plugin.video.VADER/mc/'
+        xbmc.executebuiltin("XBMC.PlayMedia("+mc+")")
+    def LSport(self):
+        mc = 'Videos,plugin://plugin.video.VADER/livetv/category/26&quot;,return'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def tvs1(self):
+        mc = 'Videos,plugin://plugin.video.VADER/vod/category/55/'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def tvs4k(self):
+        mc = 'Videos,plugin://plugin.video.VADER/vod/category/737/'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def wbvod(self):
+        mc = 'Videos,plugin://plugin.video.VADER/vod/recent/tvshows'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def movies1(self):
+        mc = 'Videos,plugin://plugin.video.VADER/vod/category/53/'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def movies4k(self):
+        mc = 'Videos,plugin://plugin.video.VADER/vod/category/687/'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def moviesby(self):
+        mc = 'Videos,plugin://plugin.video.VADER/vod/recent/movies'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def VVOD(self):
+        mc = 'Videos,plugin://plugin.video.VADER/vod/category/all/'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def LiveTVChannels(self):
+        mc = 'Videos,plugin://plugin.video.VADER/livetv/category/all'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def TVcatchup(self):
+        mc = 'Videos,plugin://plugin.video.VADER/catchup/tv'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def MatchcenterCatchup(self):
+        mc = 'Videos,plugin://plugin.video.VADER/catchup/mc'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
+    def ATools(self):
+        mc = 'plugin://plugin.video.VADER/tools'
+        xbmc.executebuiltin("XBMC.PlayMedia("+mc+")")
+    def MyAccount(self):
+        mc = 'Videos,plugin://plugin.video.VADER/accountInfo'
+        xbmc.executebuiltin("XBMC.ActivateWindow("+mc+")")
     def __init__(self):
         super(TVGuide, self).__init__()
 
@@ -757,6 +815,11 @@ class TVGuide(xbmcgui.WindowXML):
 
         elif not self.osdEnabled:
             pass  # skip the rest of the actions
+        elif action.getId() == ACTION_PREVIOUS_MENU and action.getButtonCode() == KEY_ESC:
+            self.viewStartDate = datetime.datetime.today()
+            self.viewStartDate -= datetime.timedelta(minutes=self.viewStartDate.minute % 60, seconds=self.viewStartDate.second)
+            self.currentProgram = self.database.getCurrentProgram(self.currentChannel)
+            self.onRedrawEPG(self.channelIdx, self.viewStartDate)
 
         elif action.getId() in COMMAND_ACTIONS["CLOSE"]:
             self.viewStartDate = datetime.datetime.today()
@@ -801,7 +864,8 @@ class TVGuide(xbmcgui.WindowXML):
 
         if action.getId() in COMMAND_ACTIONS["OSD"]:
             self._hideOsd()
-
+        elif action.getId() == ACTION_PREVIOUS_MENU and action.getButtonCode() == KEY_ESC:
+            self._hideOsd()
         elif action.getId() in COMMAND_ACTIONS["CLOSE"]:
             if self.mode == MODE_OSD:
                 self._hideOsd()
@@ -1242,18 +1306,15 @@ class TVGuide(xbmcgui.WindowXML):
                 f.close()
                 self.categories = [category for category in categories if category]
 
-        elif action.getId() in COMMAND_ACTIONS["MENU"] and controlInFocus is not None:
-            program = self._getProgramFromControl(controlInFocus)
-            if program is not None:
-                self._showContextMenu(program)
-        elif action.getId() in COMMAND_ACTIONS["LEFT"] and self.getFocusId() not in [self.C_MAIN_ACTIONS,self.C_MAIN_CATEGORY,self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101]:
+        elif action.getId() in COMMAND_ACTIONS["LEFT"] and self.getFocusId() not in [self.C_MAIN_ACTIONS,self.C_MAIN_CATEGORY,self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101, 4319, 4311, 4318, 431266, 431267, 430001, 431268, 431269, 431270, 431271, 431272, 431273, 431274, 431275, 431276, 431277, 431278, 431279, 431280, 431281, 431282, 431283, 999801]:
             self._left(currentFocus)
-        elif action.getId() in COMMAND_ACTIONS["RIGHT"] and self.getFocusId() not in [self.C_MAIN_ACTIONS,self.C_MAIN_CATEGORY,self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101]:
+        elif action.getId() in COMMAND_ACTIONS["RIGHT"] and self.getFocusId() not in [self.C_MAIN_ACTIONS,self.C_MAIN_CATEGORY,self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101, 4319, 4311, 4318, 431266, 431267, 43000, 431268, 4312691, 430001, 431269, 431270, 431271, 431272, 431273, 431274, 431275, 431276, 431277, 431278, 431279, 431280, 431281, 431282, 431283, 999801]:
             self._right(currentFocus)
-        elif action.getId() in COMMAND_ACTIONS["UP"] and self.getFocusId() not in [self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101]:
+        elif action.getId() in COMMAND_ACTIONS["UP"] and self.getFocusId() not in [self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101, 4319, 4311, 4318, 431266, 431267, 430001, 431268, 431269, 431270, 431271, 431272, 431273, 431274, 431275, 431276, 431277, 431278, 431279, 431280, 431281, 431282, 431283, 999801]:
             self._up(currentFocus)
-        elif action.getId() in COMMAND_ACTIONS["DOWN"] and self.getFocusId() not in [self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101]:
+        elif action.getId() in COMMAND_ACTIONS["DOWN"] and self.getFocusId() not in [self.C_MAIN_PROGRAM_CATEGORIES,self.C_MAIN_MOUSE_SEARCH, 8000053, 4307, 4310, 4301, 4316, 4315, 1010101010, 4306, 9111, 43061, 43062, 43063, 10101, 4319, 4311, 4318, 431266, 431267, 430001, 431268, 431269, 431270, 431271, 431272, 431273, 431274, 431275, 431276, 431277, 431278, 431279, 431280, 431281, 431282, 431283, 999801]:
             self._down(currentFocus)
+
 
         else:
             xbmc.log('[script.tvguide.Vader] Unhandled ActionId: ' + str(action.getId()), xbmc.LOGDEBUG)
@@ -1325,8 +1386,6 @@ class TVGuide(xbmcgui.WindowXML):
                 self.showListing(program.channel)
         elif action.getId() in COMMAND_ACTIONS["MENU"] and controlInFocus is not None:
             program = self._getQuickProgramFromControl(controlInFocus)
-            if program is not None:
-                self._showContextMenu(program)
         else:
             xbmc.log('[script.tvguide.Vader] quick epg Unhandled ActionId: ' + str(action.getId()), xbmc.LOGDEBUG)
 
@@ -1409,7 +1468,7 @@ class TVGuide(xbmcgui.WindowXML):
             self.onRedrawEPG(self.channelIdx, self.viewStartDate)
             self.setControlVisible(self.C_MAIN_IMAGE,True)
             return
-			
+
         elif controlId in [self.C_MAIN_MOUSE_STOP]:
             self.player.stop()
             self.clear_catchup()
@@ -1484,6 +1543,51 @@ class TVGuide(xbmcgui.WindowXML):
             return
         elif controlId == self.C_MAIN_REFRESH:
             self.sleep()
+            return
+        elif controlId == self.C_MAIN_MATCHCENTER:
+            self.Matchcenter()
+            return
+        elif controlId == self.C_MAIN_MATCHCENTER2:
+            self.Matchcenter()
+            return
+        elif controlId == self.C_MAIN_VOD:
+            self.VVOD()
+            return
+        elif controlId == self.C_MAIN_LIVESPORTS:
+            self.LSport()
+            return
+        elif controlId == self.C_MAIN_TOOLS:
+            self.ATools()
+            return
+        elif controlId == self.C_MAIN_MYACCOUNT:
+            self.MyAccount()
+            return
+        elif controlId == self.C_MAIN_TVSHOWS:
+            self.tvs1()
+            return
+        elif controlId == self.C_MAIN_LIVETVCHANNELS:
+            self.LiveTVChannels()
+            return
+        elif controlId == self.C_MAIN_TVCATCHUP:
+            self.TVcatchup()
+            return
+        elif controlId == self.C_MAIN_MATCHCENTERCATCHUP:
+            self.MatchcenterCatchup()
+            return
+        elif controlId == self.C_MAIN_MOVIES4K:
+            self.movies4k()
+            return
+        elif controlId == self.C_MAIN_MOVIESBY:
+            self.moviesby()
+            return
+        elif controlId == self.C_MAIN_TVSHOWS4K:
+            self.tvs4k()
+            return
+        elif controlId == self.C_MAIN_WBVOD:
+            self.wbvod()
+            return
+        elif controlId == self.C_MAIN_MOVIES:
+            self.movies1()
             return
         elif controlId == self.C_MAIN_MOUSE_SEARCH:
             self.programSearchSelect()
@@ -1714,7 +1818,7 @@ class TVGuide(xbmcgui.WindowXML):
 
     def programSearchSelect(self):
         d = xbmcgui.Dialog()
-        what = d.select("Search",["Title","Synopsis","Category","Channel"])
+        what = d.select("Search",["Search for Program Title","Search in Program Description","Search For Channel"])
         if what == -1:
             return
         if what == 0:
@@ -1722,8 +1826,6 @@ class TVGuide(xbmcgui.WindowXML):
         elif what == 1:
             self.descriptionSearch()
         elif what == 2:
-            self.categorySearch()
-        elif what == 3:
             self.channelSearch()
 
 
@@ -3064,12 +3166,13 @@ class TVGuide(xbmcgui.WindowXML):
         while countdown:
             time.sleep(1)
             countdown = countdown - 1
+
             if self.player.isPlaying():
                 if self.mode == MODE_OSD and not self.osdActive:
                     self._hideOsd()
-                return
             if self.tryingToPlay == False:
                 return
+
 
         finish = False
         if ADDON.getSetting('play.alt.continue') == 'true':
@@ -3100,10 +3203,17 @@ class TVGuide(xbmcgui.WindowXML):
         else:
             finish = True
 
+        if self.player.isPlaying():
+            finish = False
+
+        # while self.player.isPlaying():
+        #     time.sleep(1)
+
         if finish:
             if not self.osdActive:
                 self._hideOsd()
             self.onRedrawEPG(self.channelIdx, self.viewStartDate)
+
 
 
     def _updateNextUpInfo(self,firstTime):
@@ -4770,8 +4880,8 @@ class PopupMenu(xbmcgui.WindowXMLDialog):
             url = url.replace("%E",str(program.episode))
             url = url.replace("%D",str(minutes))
             xbmc.Player().play(item=url)
-            self.action = KEY_CONTEXT_MENU 
-            self.close()			
+            self.action = KEY_CONTEXT_MENU
+            self.close()
         elif controlId == self.C_POPUP_CATEGORY:
             cList = self.getControl(self.C_POPUP_CATEGORY)
             item = cList.getSelectedItem()

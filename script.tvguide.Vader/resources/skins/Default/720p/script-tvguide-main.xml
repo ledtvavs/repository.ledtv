@@ -238,6 +238,18 @@
 				<texture>black.png</texture>
 				<visible>true</visible>
 			</control>
+
+			<control type="button" id="999801">
+				<posx>85</posx>
+				<posy>200</posy>
+				<width>75</width>
+				<height>40</height>
+				<texturefocus>.png</texturefocus>
+				<texturenofocus>menu.png</texturenofocus>
+				<onup>4310</onup>
+				<ondown>7004</ondown>
+				<visible>true</visible>
+			</control>
 			
 			<control type="image" id="99980">
                 <description>side bar</description>
@@ -258,7 +270,7 @@
 				<visible>true</visible>
 			</control>
 			
-			<control type="image" id="999801">
+			<control type="image">
                 <description>time & date</description>
                 <posx>1108</posx>
 				<posy>238</posy>
@@ -290,19 +302,20 @@
                 <visible>Control.IsVisible(4200)</visible>
                 <texture>timeline.png</texture>
             </control>
-<control type="button" id="4312">
-            <posx>8</posx>
-            <posy>205</posy>
-            <width>25</width>
-            <height>25</height>
-            <texturefocus>search.png</texturefocus>
-            <texturenofocus>search1.png</texturenofocus>
+			
+<control type="button" id="4319">
+            <posx>0</posx>
+            <posy>198</posy>
+            <width>30</width>
+            <height>30</height>
+            <texturefocus>-1dayf.png</texturefocus>
+            <texturenofocus>-1day.png</texturenofocus>
             <onclick></onclick>
-            <onleft>7004</onleft>
+            <onleft>4306</onleft>
             <!--<onright>30452</onright>-->
-            <onright>4310</onright>
+            <onright>4301</onright>
 			<!--<onup>30451</onup>-->
-			<onup>43061</onup>
+			<onup>4310</onup>
 			<!--<ondown>7004</ondown>-->
 			<ondown>7004</ondown>
             <align>left</align>
@@ -311,40 +324,19 @@
 			<focusedcolor>black</focusedcolor>
             <label></label>
 		</control>
-		<control type="button" id="4310">
-			<posx>40</posx>
-            <posy>205</posy>
-            <width>25</width>
-            <height>25</height>
-            <texturefocus>list.png</texturefocus>
-            <texturenofocus>list1.png</texturenofocus>
-            <onclick></onclick>
-            <onleft>4312</onleft>
-            <!--<onright>30452</onright>-->
-            <onright>4315</onright>
-			<!--<onup>30451</onup>-->
-			<onup></onup>
-			<!--<ondown>40044</ondown>-->
-			<ondown>7004</ondown>
-            <align>left</align>
-            <font>font10</font>
-            <textcolor>none</textcolor>
-			<focusedcolor>black</focusedcolor>
-            <label></label>
-		</control>
 		<control type="button" id="4301">
-            <posx>107</posx>
-            <posy>205</posy>
+            <posx>30</posx>
+            <posy>202</posy>
             <width>25</width>
             <height>25</height>
-            <texturefocus>home.png</texturefocus>
-            <texturenofocus>home1.png</texturenofocus>
+            <texturefocus>home1.png</texturefocus>
+            <texturenofocus>Home.png</texturenofocus>
             <onclick></onclick>
-            <onleft>4315</onleft>
+            <onleft>4319</onleft>
             <!--<onright>30452</onright>-->
-            <onright>1010101010</onright>
+            <onright>4318</onright>
 			<!--<onup>30451</onup>-->
-			<onup></onup>
+			<onup>4310</onup>
 			<!--<ondown>40044</ondown>-->
 			<ondown>7004</ondown>
             <align>left</align>
@@ -353,40 +345,19 @@
 			<focusedcolor>black</focusedcolor>
             <label></label>
 		</control>
-		<control type="button" id="4315">
-            <posx>73</posx>
-            <posy>205</posy>
-            <width>25</width>
-            <height>25</height>
-			<texturefocus>stop.png</texturefocus>
-            <texturenofocus>stop1.png</texturenofocus>
+		<control type="button" id="4318">
+            <posx>55</posx>
+            <posy>198</posy>
+            <width>30</width>
+            <height>30</height>
+            <texturefocus>1dayf.png</texturefocus>
+            <texturenofocus>1day.png</texturenofocus>
             <onclick></onclick>
-            <onleft>4310</onleft>
-            <!--<onright>30452</onright>-->
-            <onright>4301</onright>
-			<!--<onup>30451</onup>-->
-			<onup></onup>
-			<!--<ondown>40044</ondown>-->
-			<ondown>7004</ondown>
-            <align>left</align>
-            <font>font10</font>
-            <textcolor>none</textcolor>
-			<focusedcolor>black</focusedcolor>
-            <label></label>
-		</control>
-		<control type="button" id="1010101010">
-            <posx>140</posx>
-            <posy>205</posy>
-            <width>25</width>
-            <height>25</height>
-            <texturefocus>settings.png</texturefocus>
-            <texturenofocus>settings1.png</texturenofocus>
-            <onclick>Addon.OpenSettings(script.tvguide.Vader)</onclick>
             <onleft>4301</onleft>
             <!--<onright>30452</onright>-->
             <onright>10101</onright>
 			<!--<onup>30451</onup>-->
-			<onup>43061</onup>
+			<onup>4310</onup>
 			<!--<ondown>7004</ondown>-->
 			<ondown>7004</ondown>
             <align>left</align>
@@ -396,18 +367,18 @@
             <label></label>
 		</control>
 		<control type="button" id="10101">
-            <posx>1205</posx>
-            <posy>203</posy>
-            <width>27</width>
-            <height>27</height>
+            <posx>1170</posx>
+            <posy>201</posy>
+            <width>28</width>
+            <height>28</height>
             <texturefocus>refreshf.png</texturefocus>
             <texturenofocus>refresh.png</texturenofocus>
             <onclick></onclick>
-            <onleft>1010101010</onleft>
+            <onleft>4318</onleft>
             <!--<onright>30452</onright>-->
-            <onright>4306</onright>
+            <onright>4315</onright>
 			<!--<onup>30451</onup>-->
-			<onup></onup>
+			<onup>4310</onup>
 			<!--<ondown>40044</ondown>-->
 			<ondown>7004</ondown>
             <align>left</align>
@@ -416,19 +387,19 @@
 			<focusedcolor>black</focusedcolor>
             <label></label>
 		</control>
-		<control type="button" id="4306">
-            <posx>1240</posx>
-            <posy>205</posy>
-            <width>22</width>
-            <height>22</height>
-            <texturefocus>power.png</texturefocus>
-            <texturenofocus>power1.png</texturenofocus>
+		<control type="button" id="4315">
+            <posx>1205</posx>
+            <posy>202</posy>
+            <width>25</width>
+            <height>25</height>
+			<texturefocus>stop1.png</texturefocus>
+            <texturenofocus>stop.png</texturenofocus>
             <onclick></onclick>
             <onleft>10101</onleft>
             <!--<onright>30452</onright>-->
-            <onright></onright>
+            <onright>4306</onright>
 			<!--<onup>30451</onup>-->
-			<onup></onup>
+			<onup>4310</onup>
 			<!--<ondown>40044</ondown>-->
 			<ondown>7004</ondown>
             <align>left</align>
@@ -437,7 +408,27 @@
 			<focusedcolor>black</focusedcolor>
             <label></label>
 		</control>
-			
+				<control type="button" id="4306">
+            <posx>1237</posx>
+            <posy>202</posy>
+            <width>25</width>
+            <height>25</height>
+            <texturefocus>power1.png</texturefocus>
+            <texturenofocus>power.png</texturenofocus>
+            <onclick></onclick>
+            <onleft>4315</onleft>
+            <!--<onright>30452</onright>-->
+            <onright>4319</onright>
+			<!--<onup>30451</onup>-->
+			<onup>4310</onup>
+			<!--<ondown>40044</ondown>-->
+			<ondown>7004</ondown>
+            <align>left</align>
+            <font>font10</font>
+            <textcolor>none</textcolor>
+			<focusedcolor>black</focusedcolor>
+            <label></label>
+		</control>
 
             <control type="image">
                 <description>channels background</description>
@@ -1834,25 +1825,6 @@
                     <visible>false</visible>
                 </control>
 
-				
-                <control type="button" id="4311">
-                    <description>next list</description>
-                    <posx>730</posx>
-                    <posy>20r</posy>
-                    <width>40</width>
-                    <height>40</height>
-                    <label></label>
-                    <font>font13</font>
-                    <aligny>center</aligny>
-                    <align>center</align>
-                    <textcolor>grey</textcolor>
-                    <focusedcolor>black</focusedcolor>
-                    <texturefocus>tvg-button-focus.pn</texturefocus>
-                    <texturenofocus>tvg-button-nofocus.pn</texturenofocus>
-                </control>
-
-               
-
                 <control type="button" id="4314">
                     <description>channel number</description>
                     <posx>430</posx>
@@ -1871,23 +1843,6 @@
                 </control>
 
                
-
-                <control type="button" id="4317">
-                    <description>spare</description>
-                    <posx>300</posx>
-                    <posy>480</posy>
-                    <width>90</width>
-                    <height>20</height>
-                    <label>MINE</label>
-                    <font>font13</font>
-                    <aligny>center</aligny>
-                    <align>center</align>
-                    <textcolor>grey</textcolor>
-                    <focusedcolor>black</focusedcolor>
-                    <texturefocus>tvg-button-focus.png</texturefocus>
-                    <texturenofocus>tvg-button-nofocus.png</texturenofocus>
-                    <visible>false</visible>
-                </control>
 
 				<control type="button" id="4302">
                     <description>navigate left</description>
@@ -1996,7 +1951,7 @@
                 <width>1110</width>
                 <height>40</height>
                 <visible>true</visible>
-                <onup>4312</onup>
+                <onup>4319</onup>
                 <ondown></ondown>
                 <onleft></onleft>
                 <onright></onright>
@@ -2013,7 +1968,7 @@
                         <visible>true</visible>
                     </control>
 
-			<control type="image" id="999801">
+			<control type="image">
                 <description>time & date</description>
                 <posx>0</posx>
 				<posy>0</posy>
@@ -3857,6 +3812,305 @@
                 <visible>true</visible>
                 <label></label>
             </control>
-		
+		<!-- Main Menu -->
+		<control type="image">
+			<description>category background Main Menu</description>
+			<posx>0</posx>
+			<posy>0</posy>
+			<width>2000</width>
+			<height>195</height>
+			<texture>black.png</texture>
+			<visible>Control.HasFocus(999801) | Control.HasFocus(431280) | Control.HasFocus(431281) | Control.HasFocus(431276) | Control.HasFocus(431277)| Control.HasFocus(431278)| Control.HasFocus(431279) | Control.HasFocus(431272) | Control.HasFocus(431273) | Control.HasFocus(431274) | Control.HasFocus(431275) | Control.HasFocus(431270) | Control.HasFocus(431271) | Control.HasFocus(431266) | Control.HasFocus(431268) | Control.HasFocus(431269)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) | Control.HasFocus(10101)| Control.HasFocus(4301)| Control.HasFocus(4319) | Control.HasFocus(4318) | Control.HasFocus(4315) | Control.HasFocus(4301) | Control.HasFocus(4310) | Control.HasFocus(100022) | Control.HasFocus(100023) | Control.HasFocus(4311) | Control.HasFocus(4312) | Control.HasFocus(100024) | Control.HasFocus(100025) | Control.HasFocus(100026) | Control.HasFocus(100027) | Control.HasFocus(100028) | Control.HasFocus(100029)</visible>
+			<animation effect="fade" time="550">Visible</animation>
+			<animation effect="fade" time="750">Hidden</animation>
+		</control>
+            <control type="label">
+                <description>Prevous Day</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Go Back One Day</label>
+				<visible>Control.HasFocus(4319)</visible>
+            </control>
+			
+            <control type="label">
+                <description>Home</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Back to Now</label>
+				<visible>Control.HasFocus(4301)</visible>
+            </control>
+			
+            <control type="label">
+                <description>Next Day</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Go Forward One Day</label>
+				<visible>Control.HasFocus(4318)</visible>
+            </control>
+
+            <control type="label">
+                <description>Reffresh</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Reload Guide Data</label>
+				<visible>Control.HasFocus(10101)</visible>
+            </control>
+
+            <control type="label">
+                <description>Stop</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Stop Playback</label>
+				<visible>Control.HasFocus(4315)</visible>
+            </control>
+
+            <control type="label">
+                <description>Power</description>
+                <posx>1060</posx>
+                <posy>160</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>red</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Exit Guide</label>
+				<visible>Control.HasFocus(4306)</visible>
+            </control>
+            <control type="label">
+                <description>showing now</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>What's Showing Now</label>
+				<visible>Control.HasFocus(4310)</visible>
+            </control>
+            <control type="label">
+                <description>Showing Next</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>What's Showing Next</label>
+				<visible>Control.HasFocus(4311)</visible>
+            </control>
+            <control type="label">
+                <description>Search</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Search for Programs</label>
+				<visible>Control.HasFocus(4312)</visible>
+            </control>
+            <control type="label">
+                <description>Favs</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Kodi Favourites</label>
+				<visible>Control.HasFocus(4316)</visible>
+            </control>
+            <control type="label">
+                <description>Settings</description>
+                <posx>460</posx>
+                <posy>150</posy>
+                <width>300</width>
+                <height>35</height>
+                <textcolor>blue</textcolor>
+                <shadowcolor></shadowcolor>
+				<font>[B]font13[/B]</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <visible>true</visible>
+                <label>Settings</label>
+				<visible>Control.HasFocus(430001)</visible>
+            </control>
+		<control type="image">
+            <posx>85</posx>
+            <posy>200</posy>
+            <width>75</width>
+            <height>36</height>
+            <texture>black.png</texture>
+            <visible>Control.HasFocus(999801) | Control.HasFocus(431266)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) |Control.HasFocus(10101)| Control.HasFocus(4301)| Control.HasFocus(4319)| Control.HasFocus(4318) |Control.HasFocus(4301)| Control.HasFocus(4315)| Control.HasFocus(4310) | Control.HasFocus(4311) | Control.HasFocus(4312)</visible>		
+		</control>
+		<control type="image">
+            <posx>0</posx>
+            <posy>120</posy>
+            <width>75</width>
+            <height>40</height>
+            <texture>menu.png</texture>
+            <visible>Control.HasFocus(4319)| Control.HasFocus(4318) |Control.HasFocus(4301)| Control.HasFocus(4315)| Control.HasFocus(10101)| Control.HasFocus(4301)</visible>
+		</control>
+		<control type="image">
+            <posx>0</posx>
+            <posy>162</posy>
+            <width>75</width>
+            <height>28</height>
+            <texture>menufff.png</texture>
+            <visible>Control.HasFocus(999801) | Control.HasFocus(431266)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) |Control.HasFocus(4310)| Control.HasFocus(4311)| Control.HasFocus(4312)| Control.HasFocus(4318) | Control.HasFocus(4319)| Control.HasFocus(4301)| Control.HasFocus(4315)| Control.HasFocus(10101)| Control.HasFocus(4301)</visible>
+		</control>
+			<control type="button" id="4310">
+			<description>List Now</description>
+            <posx>100</posx>
+            <posy>0</posy>
+            <width>150</width>
+            <height>150</height>
+            <texturefocus>Nowf.png</texturefocus>
+            <texturenofocus>Now.png</texturenofocus>
+            <align>left</align>
+            <font>font10</font>
+			<ondown>7004</ondown>
+			<onright>4311</onright>
+            <textcolor>none</textcolor>
+			<focusedcolor>black</focusedcolor>
+            <visible>Control.HasFocus(999801) | Control.HasFocus(431266)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) | Control.HasFocus(10101)| Control.HasFocus(4301)| Control.HasFocus(4319) | Control.HasFocus(4318) | Control.HasFocus(4315) | Control.HasFocus(4301) | Control.HasFocus(4310) | Control.HasFocus(4311) | Control.HasFocus(4312) | Control.HasFocus(100022) | Control.HasFocus(100023) | Control.HasFocus(100024) | Control.HasFocus(100025) | Control.HasFocus(100026) | Control.HasFocus(100027) | Control.HasFocus(100028) | Control.HasFocus(100029)</visible>
+			<animation effect="slide" start="0,-200" end="0,0" time="400">Visible</animation>
+			<animation effect="slide" start="0,0" end="0,-640" time="900">Hidden</animation>
+			</control>
+			
+			<control type="button" id="4311">
+            <description>List Next</description>
+			<posx>320</posx>
+            <posy>0</posy>
+            <width>150</width>
+            <height>150</height>
+            <texturefocus>Next1f.png</texturefocus>
+            <texturenofocus>Next1.png</texturenofocus>
+            <align>left</align>
+            <font>font10</font>
+			<onleft>4310</onleft>
+			<onright>4312</onright>
+			<ondown>7004</ondown>
+            <textcolor>none</textcolor>
+			<focusedcolor>black</focusedcolor>
+			<visible>Control.HasFocus(999801) | Control.HasFocus(431266)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) | Control.HasFocus(10101)| Control.HasFocus(4301)| Control.HasFocus(4319) | Control.HasFocus(4318) | Control.HasFocus(4315) | Control.HasFocus(4301) | Control.HasFocus(4310) | Control.HasFocus(4311) | Control.HasFocus(4312) | Control.HasFocus(100022) | Control.HasFocus(100023) | Control.HasFocus(100024) | Control.HasFocus(100025) | Control.HasFocus(100026) | Control.HasFocus(100027) | Control.HasFocus(100028) | Control.HasFocus(100029)</visible>
+			<animation effect="slide" start="0,-200" end="0,0" time="400">Visible</animation>
+			<animation effect="slide" start="0,0" end="0,-640" time="900">Hidden</animation>
+			</control>
+			
+			<control type="button" id="4312">
+            <description>Search</description>
+			<posx>550</posx>
+            <posy>10</posy>
+            <width>120</width>
+            <height>120</height>
+            <texturefocus>searchf.png</texturefocus>
+            <texturenofocus>search.png</texturenofocus>
+            <onclick></onclick>
+            <onleft>4311</onleft>
+			<onright>4316</onright>
+			<ondown>7004</ondown>
+            <align>left</align>
+			<visible>Control.HasFocus(999801) | Control.HasFocus(431266)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) | Control.HasFocus(10101)| Control.HasFocus(4301)| Control.HasFocus(4319) | Control.HasFocus(4318) | Control.HasFocus(4315) | Control.HasFocus(4301) | Control.HasFocus(4310) | Control.HasFocus(4311) | Control.HasFocus(4312) | Control.HasFocus(100022) | Control.HasFocus(100023) | Control.HasFocus(100024) | Control.HasFocus(100025) | Control.HasFocus(100026) | Control.HasFocus(100027) | Control.HasFocus(100028) | Control.HasFocus(100029)</visible>
+			<animation effect="slide" start="0,-200" end="0,0" time="400">Visible</animation>
+			<animation effect="slide" start="0,0" end="0,-640" time="900">Hidden</animation>
+			</control>
+			
+			
+			<control type="button" id="4316">
+            <description>Favourites</description>
+			<posx>750</posx>
+            <posy>15</posy>
+            <width>130</width>
+            <height>120</height>
+            <texturefocus>Favf.png</texturefocus>
+            <texturenofocus>Fav.png</texturenofocus>
+            <onclick></onclick>
+            <onleft>4312</onleft>
+			<onright>430001</onright>
+			<ondown>7004</ondown>
+            <align>left</align>
+			<visible>Control.HasFocus(999801) | Control.HasFocus(431266)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) | Control.HasFocus(10101)| Control.HasFocus(4301)| Control.HasFocus(4319) | Control.HasFocus(4318) | Control.HasFocus(4315) | Control.HasFocus(4301) | Control.HasFocus(4310) | Control.HasFocus(4311) | Control.HasFocus(4312) | Control.HasFocus(100022) | Control.HasFocus(100023) | Control.HasFocus(100024) | Control.HasFocus(100025) | Control.HasFocus(100026) | Control.HasFocus(100027) | Control.HasFocus(100028) | Control.HasFocus(100029)</visible>
+			<animation effect="slide" start="0,-200" end="0,0" time="400">Visible</animation>
+			<animation effect="slide" start="0,0" end="0,-640" time="900">Hidden</animation>
+			</control>
+			
+			<control type="button" id="430001">
+            <description>Settings</description>
+			<posx>960</posx>
+            <posy>0</posy>
+            <width>145</width>
+            <height>145</height>
+            <texturefocus>Settings1f.png</texturefocus>
+            <texturenofocus>Settings1.png</texturenofocus>
+            <onclick>Addon.OpenSettings(script.tvguide.Vader)</onclick>
+            <onleft>4316</onleft>
+			<onright></onright>
+			<ondown>7004</ondown>
+            <align>left</align>
+			<visible>Control.HasFocus(999801) | Control.HasFocus(431266)| Control.HasFocus(431267)| Control.HasFocus(4316) | Control.HasFocus(430001) | Control.HasFocus(10101)| Control.HasFocus(4301)| Control.HasFocus(4319) | Control.HasFocus(4318) | Control.HasFocus(4315) | Control.HasFocus(4301) | Control.HasFocus(4310) | Control.HasFocus(4311) | Control.HasFocus(4312) | Control.HasFocus(100022) | Control.HasFocus(100023) | Control.HasFocus(100024) | Control.HasFocus(100025) | Control.HasFocus(100026) | Control.HasFocus(100027) | Control.HasFocus(100028) | Control.HasFocus(100029)</visible>
+			<animation effect="slide" start="0,-200" end="0,0" time="400">Visible</animation>
+			<animation effect="slide" start="0,0" end="0,-640" time="900">Hidden</animation>
+			</control>
+
     </controls>
 </window>
