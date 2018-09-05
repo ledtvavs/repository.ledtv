@@ -48,8 +48,17 @@ import requests
 from itertools import chain
 
 import resources.lib.pytz as pytz
+
 from resources.lib.pytz import timezone
+try:
+    import dateutil.parser
+except:
+    xbmc.log('[script.tvguide.Vader] ...failed to load dateutil try local', xbmc.LOGNOTICE)
+    import resources.lib.dateutil.parser
+
+
 import traceback
+import calendar
 
 import sys
 # sys.setdefaultencoding() does not exist, here!
@@ -61,6 +70,14 @@ from sdAPI import SdAPI
 from utils import *
 
 SETTINGS_TO_CHECK = ['source', 'xmltv.type', 'xmltv.file', 'xmltv.url', 'xmltv.logo.folder', 'logos.source', 'logos.folder', 'logos.url', 'source.source', 'yo.countries' , 'tvguide.co.uk.systemid']
+
+
+def UTCToLocal(utc_dt):
+    # get integer timestamp to avoid precision lost
+    timestamp = calendar.timegm(utc_dt.timetuple())
+    local_dt = datetime.datetime.fromtimestamp(timestamp)
+    assert utc_dt.resolution >= datetime.timedelta(microseconds=1)
+    return local_dt.replace(microsecond=utc_dt.microsecond)
 
 def log(x):
     xbmc.log(repr(x))
@@ -1856,7 +1873,15 @@ class XMLTVSource(Source):
                 xbmc.log('[script.tvguide.Vader] trying to get stream list ' + str(tries), xbmc.LOGNOTICE)
 
                 streamsTxt = requests.get('http://localhost:62555/getStreams').text
+                xbmc.log('[script.tvguide.Vader] got streams', xbmc.LOGNOTICE)
+
                 streams = json.loads(streamsTxt)
+                credsTxt = requests.get('http://localhost:62555/getCreds').text
+                xbmc.log('[script.tvguide.Vader] got creds', xbmc.LOGNOTICE)
+
+                creds = json.loads(credsTxt)
+                username = creds['username']
+                password = creds['password']
             except:
                 time.sleep(2)
                 tries = tries + 1
@@ -1870,9 +1895,9 @@ class XMLTVSource(Source):
         valid_streams = []
         for stream in streams:
 
-            cid = str(stream['stream_id'])
+            cid = str(stream['id'])
             valid_streams.append(cid)
-            title = stream['name']
+            title = stream['stream_display_name']
             streamUrl = None
             visible = 1
             logo = stream['stream_icon']
@@ -1917,9 +1942,9 @@ class XMLTVSource(Source):
 
         # for stream_id in valid_streams:
         #     epgUrl = 'http://vaders.tv/epg?gzip=true&start={epgStart}&end={epgEnd}&stream_id={stream_id}'.format(stream_id=stream_id,epgStart=epgStart, epgEnd=epgEnd)
-        epgUrl = 'http://vaders.tv/epg?gzip=true&start={epgStart}&end={epgEnd}'.format(epgStart=epgStart, epgEnd=epgEnd)
+        epgUrl = 'http://vapi.vaders.tv/epg/channels?username={username}&password={password}&start={epgStart}&end={epgEnd}'.format(epgStart=epgStart, epgEnd=epgEnd, username=username, password=password)
 
-        xbmc.log('[script.tvguide.Vader] ' + str(epgUrl), xbmc.LOGNOTICE)
+        # xbmc.log('[script.tvguide.Vader] ' + str(epgUrl), xbmc.LOGNOTICE)
 
         programsReq = requests.get(epgUrl, timeout=120)
         programsReq.encoding = 'utf-8'
@@ -1927,80 +1952,79 @@ class XMLTVSource(Source):
 
         # programsText = unicode(programsText, 'utf-8')
         xbmc.log('[script.tvguide.Vader] downloaded json txt', xbmc.LOGNOTICE)
-        programs = json.loads(programsText, encoding='utf-8')
+
+        channels = json.loads(programsText, encoding='utf-8')
+
+        xbmc.log('[script.tvguide.Vader] loaded json epg', xbmc.LOGNOTICE)
+        totalCount = len(channels)
+        dialog.create('EPG Updater', 'Updating EPG...')
         del programsText
         del programsReq
 
-        xbmc.log('[script.tvguide.Vader] loaded json epg', xbmc.LOGNOTICE)
-        totalCount = len(programs)
-        dialog.create('EPG Updater', 'Updating EPG...')
-
-        for program in programs:
+        for channel in channels:
+            i = i + 1
 
             try:
-                if 'stream_id' in program:
-                    cid = str(program['stream_id'])
+                    cid = str(channel['id'])
                     if cid in valid_streams:
-                        i = i + 1
+                        for program in channel['programs']:
+                            if 'title' in program:
+                                title = program['title']
 
-                        title = program['title']
+                                # xbmc.log('adding : ' + str(title), xbmc.LOGNOTICE)
+                                try:
+                                    dialog.update(int(self.percentage(i, totalCount)), 'Loading EPG Data From Server',
+                                              'Updating...')
+                                except:
+                                    pass
+                                sub_title = None
 
-                        if type(title) == type(dict()):
-                            title = title['content']
 
-                        if type(title) == type(list()):
-                            title = title[0]['content']
+                                startTime =  dateutil.parser.parse(program['start'])
+                                stopTime =  dateutil.parser.parse(program['stop'])
 
-                        if title and type(title) == type(unicode()):
-                            title = h.unescape(title)
+                                startTimeLocal = UTCToLocal(startTime)
+                                stopTimeLocal = UTCToLocal(stopTime)
 
-                        # xbmc.log('adding : ' + str(title), xbmc.LOGNOTICE)
-                        try:
-                            dialog.update(int(self.percentage(i, totalCount)), 'Loading EPG Data From Server',
-                                      'Updating...')
-                        except:
-                            pass
-                        sub_title = None
-                        startTime = self.parseXMLTVDate(program['start'])
-                        stopTime = self.parseXMLTVDate(program['stop'])
+                                startTime = time.mktime(startTimeLocal.timetuple())
+                                stopTime = time.mktime(stopTimeLocal.timetuple())
 
-                        if 'desc' in program:
-                            description = program['desc']['content']
-                        else:
-                            description = None
-                        catString = ''
-                        if 'category' in program:
-                            categoriesList = program['category']
-                            if type(categoriesList) == type(list()):
-                                for category in categoriesList:
-                                    if  type(category) == type(dict()):
-                                        try:
-                                            catString = catString + str(category['content'].encode('utf-8').decode('ascii', 'ignore'))
-                                        except:
-                                            tb = traceback.format_exc()
-                                            xbmc.log('[script.tvguide.Vader] ' + str(tb), xbmc.LOGNOTICE)
-                                            pass
+
+                                if 'desc' in program:
+                                    description = program['desc']
+                                else:
+                                    description = None
+                                catString = ''
+                                if 'category' in program:
+                                    categoriesList = program['category']
+                                    if type(categoriesList) == type(list()):
+                                        for category in categoriesList:
+                                            if  type(category) == type(dict()):
+                                                try:
+                                                    catString = catString + str(category['content'].encode('utf-8').decode('ascii', 'ignore'))
+                                                except:
+                                                    tb = traceback.format_exc()
+                                                    xbmc.log('[script.tvguide.Vader] ' + str(tb), xbmc.LOGNOTICE)
+                                                    pass
+                                            else:
+                                                catString = catString + str(category)
+
                                     else:
-                                        catString = catString + str(category)
-
-                            else:
-                                catString = categoriesList
-
-                        if  type(catString) == type(dict()):
-                            catString = catString['content']
+                                        catString = categoriesList
 
 
-                        smallIcon = None
-                        if 'icon' in program:
-                            smallIcon = program['icon']['src']
 
-                        if description and type(description) == type(unicode()):
-                            description = h.unescape(description)
+                                smallIcon = None
+                                if 'icon' in program:
+                                    smallIcon = program['icon']['src']
+
+                                if description and type(description) == type(unicode()):
+                                    description = h.unescape(description)
 
 
-                        result = Program(cid, title, sub_title, startTime,stopTime, description, catString, imageSmall=smallIcon,
-                                         season = None, episode = None, is_movie = None, language= None)
-                        yield result
+                                result = Program(cid, title, sub_title, startTime,stopTime, description, catString, imageSmall=smallIcon,
+                                                 season = None, episode = None, is_movie = None, language= None)
+                                yield result
                 #
                     # else:
                     #     xbmc.log('[script.tvguide.Vader] ' + str(program), xbmc.LOGNOTICE)

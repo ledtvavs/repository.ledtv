@@ -163,7 +163,7 @@ class StreamsService(object):
             if len(matches) == 0:
                 xbmc.log(str('no matches found'), level=xbmc.LOGNOTICE)
                 chanID = str(channel.id)
-                url = 'http://localhost:62555/?plugin://vader/playLive/' + chanID
+                url = 'http://localhost:62555/?plugin://vader/playLiveAddon/' + chanID
                 return url
             else:
                 return matches
